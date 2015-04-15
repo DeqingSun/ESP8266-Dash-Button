@@ -3,10 +3,15 @@
 #include "gpio.h"
 #include "os_type.h"
 #include "user_config.h"
+#include "c_types.h"
 #include "driver/uart.h"
+#include "audio_analyzer.h"
 
 #define user_procTaskPrio        0
 #define user_procTaskQueueLen    1
+
+extern void wdt_feed (void);
+
 os_event_t    user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
 
@@ -37,6 +42,10 @@ void some_timerfunc(void *arg)
         //Set GPIO2 to INPUT
         GPIO_DIS_OUTPUT(0);
     }
+	
+	checkMicrophone(1*1000*1000);
+	wdt_feed();
+	uart0_sendStr("Check\r\n");
 }
 
 //Do nothing function
@@ -57,7 +66,7 @@ user_init()
     // Initialize the GPIO subsystem.
     gpio_init();
 	
-	uart0_sendStr("Hello World!\r\n");
+	uart0_sendStr("\r\nHello World!\r\n");
 
     /*//Set GPIO2 to output mode
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
@@ -70,7 +79,7 @@ user_init()
 
     //Set GPIO0 low
 	GPIO_OUTPUT_SET(0, 0);	//(gpio_no, bit_value)
-
+	
     //Disarm timer
     os_timer_disarm(&some_timer);
 
@@ -81,7 +90,7 @@ user_init()
     //&some_timer is the pointer
     //1000 is the fire time in ms
     //0 for once and 1 for repeating
-    os_timer_arm(&some_timer, 1000, 1);
+    os_timer_arm(&some_timer, 2000, 1);
     
     //Start os task
     system_os_task(user_procTask, user_procTaskPrio,user_procTaskQueue, user_procTaskQueueLen);
