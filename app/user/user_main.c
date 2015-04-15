@@ -61,7 +61,7 @@ user_init()
 {
 
 	// Configure the UART
-	uart_init(BIT_RATE_9600,BIT_RATE_9600);
+	uart_init(BIT_RATE_115200,BIT_RATE_115200);
 	
     // Initialize the GPIO subsystem.
     gpio_init();
