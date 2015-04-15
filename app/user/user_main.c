@@ -3,6 +3,7 @@
 #include "gpio.h"
 #include "os_type.h"
 #include "user_config.h"
+#include "driver/uart.h"
 
 #define user_procTaskPrio        0
 #define user_procTaskQueueLen    1
@@ -26,15 +27,15 @@ void some_timerfunc(void *arg)
         gpio_output_set(BIT2, 0, BIT2, 0);
     }*/
 	//Do blinky stuff
-    if (GPIO_REG_READ(GPIO_OUT_ADDRESS) & BIT0)
+    if (GPIO_INPUT_GET(0))
     {
         //Set GPIO2 to LOW
-        gpio_output_set(0, BIT0, BIT0, 0);
+        GPIO_OUTPUT_SET(0, 0);
     }
     else
     {
-        //Set GPIO2 to HIGH
-        gpio_output_set(BIT0, 0, 0, BIT0);
+        //Set GPIO2 to INPUT
+        GPIO_DIS_OUTPUT(0);
     }
 }
 
@@ -49,8 +50,14 @@ user_procTask(os_event_t *events)
 void ICACHE_FLASH_ATTR
 user_init()
 {
+
+	// Configure the UART
+	uart_init(BIT_RATE_9600,BIT_RATE_9600);
+	
     // Initialize the GPIO subsystem.
     gpio_init();
+	
+	uart0_sendStr("Hello World!\r\n");
 
     /*//Set GPIO2 to output mode
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO2_U, FUNC_GPIO2);
@@ -62,7 +69,7 @@ user_init()
     PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0);
 
     //Set GPIO0 low
-    gpio_output_set(0, BIT0, BIT0, 0);
+	GPIO_OUTPUT_SET(0, 0);	//(gpio_no, bit_value)
 
     //Disarm timer
     os_timer_disarm(&some_timer);

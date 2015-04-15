@@ -15,7 +15,6 @@
 
 #include "driver/uart_register.h"
 //#include "ssc.h"
-//#include "at.h"
 
 // UartDev is defined and initialized in rom code.
 extern UartDevice    UartDev;
@@ -168,7 +167,7 @@ void uart0_sendStr(const char *str)
  * Parameters   : void *para - point to ETS_UART_INTR_ATTACH's arg
  * Returns      : NONE
 *******************************************************************************/
-extern void at_recvTask(void);
+//extern void at_recvTask(void);
 
 LOCAL void
 uart0_rx_intr_handler(void *para)
@@ -186,7 +185,7 @@ uart0_rx_intr_handler(void *para)
 //  }
   if (UART_RXFIFO_FULL_INT_ST == (READ_PERI_REG(UART_INT_ST(uart_no)) & UART_RXFIFO_FULL_INT_ST))
   {
-    at_recvTask();
+    //at_recvTask();
     WRITE_PERI_REG(UART_INT_CLR(uart_no), UART_RXFIFO_FULL_INT_CLR);
   }
 
