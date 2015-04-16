@@ -42,10 +42,15 @@ void some_timerfunc(void *arg)
         //Set GPIO2 to INPUT
         GPIO_DIS_OUTPUT(0);
     }
-	
-	checkMicrophone(1*1000*1000);
+	uart0_sendStr("Check\n");
+	ets_wdt_disable();	//necessary if we use too much time without OS touching it.
+	checkMicrophone(10*1000*1000);
+	os_delay_us(500*1000);	//give time for serial to finish
+	ets_wdt_enable();
 	wdt_feed();
-	uart0_sendStr("Check\r\n");
+	
+	
+	os_timer_arm(&some_timer, 100, 0);
 }
 
 //Do nothing function
@@ -61,7 +66,7 @@ user_init()
 {
 
 	// Configure the UART
-	uart_init(BIT_RATE_115200,BIT_RATE_115200);
+	uart_init(BIT_RATE_230400,BIT_RATE_230400);
 	
     // Initialize the GPIO subsystem.
     gpio_init();
@@ -90,7 +95,7 @@ user_init()
     //&some_timer is the pointer
     //1000 is the fire time in ms
     //0 for once and 1 for repeating
-    os_timer_arm(&some_timer, 2000, 1);
+    os_timer_arm(&some_timer, 100, 0);
     
     //Start os task
     system_os_task(user_procTask, user_procTaskPrio,user_procTaskQueue, user_procTaskQueueLen);

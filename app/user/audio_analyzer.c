@@ -95,6 +95,14 @@ unsigned char ICACHE_FLASH_ATTR checkMicrophone( unsigned long duration ){
 		    uartPhase=0;
 			if (bell202BufferPtr<15){
 			  bell202Buffer[bell202BufferPtr++]=charBuffer;
+			  if (charBuffer=='\n'){
+			    bell202Buffer[bell202BufferPtr]='\0';
+				uart0_sendStr(bell202Buffer);
+				bell202BufferPtr=0;
+			  }
+			  //uart0_sendStr("!\n");
+			}else{
+			  bell202BufferPtr=0;
 			}
 		  }
 		}else{
@@ -110,16 +118,16 @@ unsigned char ICACHE_FLASH_ATTR checkMicrophone( unsigned long duration ){
 	
   }while(timeLapsed<=duration);
   
-  bell202Buffer[bell202BufferPtr]='\0';
+  /*bell202Buffer[bell202BufferPtr]='\0';
   uart0_sendStr("BELL202\n");
   uart0_sendStr(bell202Buffer);
-  uart0_sendStr("\nBOVER\n");
+  uart0_sendStr("\nBOVER\n");*/
   //printf("DEBUG_STR %d %d %d %d %d %d\n",bell202Buffer[0],bell202Buffer[1],bell202Buffer[2],bell202Buffer[3],bell202Buffer[4],bell202Buffer[5]);
-  uint16_t adcValue=system_adc_read();
-  printf("adc %d\n",adcValue);
-  printf("min %d\n",minAdc);
-  printf("max %d\n",maxAdc);
-  printf("speed %d\n",speedCounter);
+  //uint16_t adcValue=system_adc_read();
+  //printf("adc %d\n",adcValue);
+  //printf("min %d\n",minAdc);
+  //printf("max %d\n",maxAdc);
+  //printf("speed %d\n",speedCounter);
   printf("Samples:");
   for (i=0;i<1024;i++){
     wdt_feed();

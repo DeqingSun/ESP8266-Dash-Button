@@ -15,12 +15,13 @@ void setup() {
   String[] serialList=Serial.list();
   String portName=serialList[0];
   for (int i=0; i<serialList.length; i++) {
-    if (serialList[i].indexOf("tty.usbmodem")>=0) {
+    if (serialList[i].indexOf("tty.usb")>=0) {
       portName=serialList[i];
     }
   }
+  println(serialList);
   println(portName);
-  myPort = new Serial(this, portName, 115200);
+  myPort = new Serial(this, portName, 230400);
   myPort.bufferUntil('\n');
 }
 
@@ -37,7 +38,7 @@ void draw() {
 
 void serialEvent(Serial p) {
   String inString = p.readString();
-  if (inString.indexOf("Samples:")==0) {
+  if ( false && inString.indexOf("Samples:")==0) {
     String dataStr=inString.substring(8, 8+1024*5-1);
     for (int i=0; i<1024; i++) {
       String valueStr=inString.substring(8+i*5, 8+i*5+4);
