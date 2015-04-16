@@ -2,16 +2,26 @@ package org.thinkcreate.esp8266_button;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener{
+
+    private Button mButton1;
+    private static final String TAG = "ESP8266_Button";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mButton1=(Button)findViewById(R.id.button_1);
+        mButton1.setOnClickListener(this);
+
     }
 
 
@@ -36,4 +46,13 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    public void onClick(View v) {
+        Log.d(TAG, "YES");
+        String ssid="ssid",password="pass";
+        //new activity_B_class(this, this, ssid, password).execute(new String[0]);
+
+    }
+
 }
