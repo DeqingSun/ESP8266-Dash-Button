@@ -5,7 +5,7 @@ import android.os.Looper;
 /**
  * Created by sundeqing on 4/16/15.
  */
-public class rev_Class_h {
+public class rev_Class_h {  //fixed
     private volatile boolean a = false;
     private volatile boolean b = false;
     private final rev_Class_j c;
@@ -61,10 +61,10 @@ public class rev_Class_h {
             public void run()
             {
                 long l = System.currentTimeMillis();    //l:v0
-                int i = (byte)(ssidStr.length() + passwordStr.length());    //i:v2 paramh //recheck after fix h TODO
+                int i = (byte)(ssidStr.length() + passwordStr.length());    //i:v2 paramh
 
                 while(true) {
-                    int j = d.a();  //j:v3  get a data //recheck after fix h TODO
+                    int j = d.a();  //j:v3  get a data
                     if (j == i) {
                         int timeLeft = (int) (46000L - (System.currentTimeMillis() - l));
                         if (timeLeft >= 0) {
@@ -91,25 +91,15 @@ public class rev_Class_h {
 
     public boolean b()
     {
-        boolean bool1 = false;
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new RuntimeException("Don't call the esptouch Task at Main(UI) thread directly.");
         }
         rev_Class_c_ssidpwd_encoder localc = new rev_Class_c_ssidpwd_encoder(this.ssidStr, this.passwordStr);
         d();
-        int i = 0;
-        for (;;)
+        for (int i=0;i<7;i++)    //i:v7
         {
-            if (i >= 7) {}
-            boolean bool2;
-            do
-            {
-                return bool1;
-                //bool2 = a(localc);//todo
-                //bool1 = bool2;
-            } while (bool2);
-            //i += 1;
-            //bool1 = bool2;
+            if (a(localc)) return true;
         }
+        return false;
     }
 }
