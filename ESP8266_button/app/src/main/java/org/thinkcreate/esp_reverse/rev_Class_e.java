@@ -9,25 +9,25 @@ public class rev_Class_e {
     private final byte c;
     private final byte d;*/
 
-    private final byte a=0;//TEST
-    private final byte b=0;
-    private final byte c=0;
-    private final byte d=0;
+    private byte a;
+    private byte b;
+    private byte c;
+    private byte d;
 
     public rev_Class_e(char paramChar, String paramString)
     {
-/*        char c1 = paramChar;  //todo
-        if (paramChar < '\020') {
+        char c1 = paramChar;  //todo
+        if (paramChar < 16) {
             c1 = (char)(paramChar + 128);
         }
-        byte[] localObject = rev_Class_l_maybe_util.b(c1);
-        this.a = localObject[0];
-        this.b = localObject[1];
-        localObject = new rev_Class_m();
-        ((rev_Class_m)localObject).a(paramString.getBytes());
-        paramString = rev_Class_l_maybe_util.b((char)(int)((rev_Class_m)localObject).getValue());
-        this.c = paramString[0];
-        this.d = paramString[1];*/
+        byte[] localByteArray = rev_Class_l_maybe_util.b(c1);
+        this.a = localByteArray[0];
+        this.b = localByteArray[1];
+        rev_Class_m localObject = new rev_Class_m();
+        localObject.a(paramString.getBytes());
+        byte[] localByteArray2 = rev_Class_l_maybe_util.b((char)((int)localObject.getValue()));
+        this.c = localByteArray2[0];
+        this.d = localByteArray2[1];
     }
 
     public byte[] a()
@@ -37,37 +37,30 @@ public class rev_Class_e {
 
     public char[] b()
     {
-        byte[] arrayOfByte = a();
-        int j = arrayOfByte.length / 2;
-        char[] arrayOfChar = new char[j];
-        int i = 0;
-        for (;;)
+        byte[] arrayOfByte = a();   //v1
+        int halfArrayLen = arrayOfByte.length / 2; //v2
+        char[] arrayOfChar = new char[halfArrayLen];    //v3
+        for (int i=0;i < halfArrayLen;i += 1)   //i:v0
         {
-            if (i >= j) {
-                return arrayOfChar;
-            }
             arrayOfChar[i] = rev_Class_l_maybe_util.b(arrayOfByte[(i * 2)], arrayOfByte[(i * 2 + 1)]);
-            i += 1;
         }
+        return arrayOfChar;
     }
 
     public String toString()
     {
-        StringBuilder localStringBuilder = new StringBuilder();
-        byte[] arrayOfByte = a();
-        int i = 0;
-        for (;;)
+        StringBuilder localStringBuilder = new StringBuilder(); //v1
+        byte[] arrayOfByte = a();   //v2
+
+        for (int i = 0;i<8;i++)//v0
         {
-            if (i >= 8) {
-                return localStringBuilder.toString();
-            }
-            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);
+            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);  //v3
             localStringBuilder.append("0x");
             if (str.length() == 1) {
                 localStringBuilder.append("0");
             }
             localStringBuilder.append(str).append(" ");
-            i += 1;
         }
+        return localStringBuilder.toString();
     }
 }
