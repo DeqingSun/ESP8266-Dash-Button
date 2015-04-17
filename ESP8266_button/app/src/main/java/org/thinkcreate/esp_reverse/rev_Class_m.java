@@ -14,37 +14,18 @@ public class rev_Class_m
 
     static
     {
-        //todo
-        /*for (int i=0;i<256;i++){
-
-
-        }
-
-        int i = 0;
-        int k;
-        int j;
-        for (;;)
-        {
-            if (i >= 256) {
-                return;
-            }
-            k = 0;
-            j = i;
-            if (k < 8) {
-                break;
+        //fixed
+        for (int i=0;i<256;i++){    //smali: i:v3 256:v5
+            int j=i;    //j:v0
+            for (int k=0;k<8;k++) {
+                if ((j & 0x1) != 0) {
+                    j = (j >> 1) ^ 0x8C;
+                }else{
+                    j = j>>1;
+                }
             }
             b[i] = ((short)j);
-            i += 1;
         }
-        if ((j & 0x1) != 0) {
-            j = j >>> 1 ^ 0x8C;
-        }
-        for (;;)
-        {
-            k += 1;
-            break;
-            j >>>= 1;
-        }*/
     }
 
     public void a(byte[] paramArrayOfByte)

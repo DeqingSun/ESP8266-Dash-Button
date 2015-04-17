@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         Log.d(TAG, "YES");
         String ssid="ssid",password="pass";
         //new activity_B_class(this, this, ssid, password).execute(new String[0]);
-
+        testClass test = new testClass();
     }
 
 }
