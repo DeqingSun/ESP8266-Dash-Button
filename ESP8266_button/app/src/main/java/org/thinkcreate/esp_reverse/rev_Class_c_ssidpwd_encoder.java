@@ -34,7 +34,7 @@ public class rev_Class_c_ssidpwd_encoder
         for (int i=0;i<this.c.length;i++){
             this.c[i] = rev_Class_l_maybe_util.c(arrayOfChar3[i]);//v3=this.c
         }
-        char[] arrayOfChar4 = new b(ssid, password).b();//v0
+        char[] arrayOfChar4 = new rev_Class_b(ssid, password).b();//v0
         this.d = new byte[arrayOfChar4.length][];
 
         for (int i=0;i<this.d.length;i++){  //i:v1
