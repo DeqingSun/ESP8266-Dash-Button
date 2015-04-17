@@ -73,9 +73,32 @@ public class rev_Class_h {
         this.d.b();
     }
 
-    private void d()
-    {
-        new rev_Class_i(this).start();
+    private void d(){
+        Thread thread = new Thread(){   //class i
+            public void run()
+            {
+                long l = System.currentTimeMillis();    //l:v0
+                int i = (byte)(ssidStr.length() + passwordStr.length());    //i:v2 paramh //recheck after fix h TODO
+
+                while(true) {
+                    int j = d.a();  //j:v3  get a data //recheck after fix h TODO
+                    if (j == i) {
+                        int timeLeft = (int) (46000L - (System.currentTimeMillis() - l));
+                        if (timeLeft >= 0) {
+                            d.a(timeLeft); //set timeout
+                            a=true;
+                        }
+                        break;
+                    } else if (j == -128) {
+                        break;
+                    }
+                }
+                a();
+                d.c();  //close socket
+            }
+
+        };
+        thread.start();
     }
 
     public void a()
