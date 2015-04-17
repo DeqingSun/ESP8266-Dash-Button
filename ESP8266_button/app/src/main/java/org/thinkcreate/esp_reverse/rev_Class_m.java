@@ -5,7 +5,7 @@ package org.thinkcreate.esp_reverse;
  */
 import java.util.zip.Checksum;
 
-public class rev_Class_m
+public class rev_Class_m    //OK
         implements Checksum
 {
     private static final short[] b = new short[256];
@@ -14,7 +14,7 @@ public class rev_Class_m
 
     static
     {
-        //fixed
+        //fixed generate LUT
         for (int i=0;i<256;i++){    //smali: i:v3 256:v5
             int j=i;    //j:v0
             for (int k=0;k<8;k++) {
@@ -50,16 +50,12 @@ public class rev_Class_m
 
     public void update(byte[] paramArrayOfByte, int paramInt1, int paramInt2)
     {
-        int i = 0;
-        for (;;)
+
+        for (int i = 0;i<paramInt2;i++)
         {
-            if (i >= paramInt2) {
-                return;
-            }
             int j = paramArrayOfByte[(paramInt1 + i)];
             int k = this.c;
             this.c = ((short)(b[((j ^ k) & 0xFF)] ^ this.c << 8));
-            i += 1;
         }
     }
 }
