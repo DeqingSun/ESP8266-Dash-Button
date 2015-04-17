@@ -10,8 +10,8 @@ public class testClass {
     byte[] a=new byte[4];
 
     public testClass(){
-        rev_Class_m temp = new rev_Class_m();
-        temp.update(a,1,1);
-
+        //rev_Class_m temp = new rev_Class_m();
+        //temp.update(a,1,1);
+        new activity_C_class_maybe_handle("SSID123", "Password456");
     }
 }

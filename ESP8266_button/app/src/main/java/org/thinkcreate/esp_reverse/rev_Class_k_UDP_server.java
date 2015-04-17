@@ -10,9 +10,9 @@ import java.net.SocketException;
  * Created by sundeqing on 4/16/15.
  */
 public class rev_Class_k_UDP_server {
-    private DatagramPacket a = new DatagramPacket(this.c, 1);
     private DatagramSocket b;
     private final byte[] c = new byte[1];
+    private DatagramPacket a = new DatagramPacket(this.c, 1);
 
     public rev_Class_k_UDP_server(int portNumber, int timeout)
     {
