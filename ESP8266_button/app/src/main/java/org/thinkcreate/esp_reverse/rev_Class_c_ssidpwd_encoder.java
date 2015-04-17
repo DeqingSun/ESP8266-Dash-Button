@@ -14,50 +14,31 @@ public class rev_Class_c_ssidpwd_encoder
 
     public rev_Class_c_ssidpwd_encoder(String ssid, String password)
     {
-        char c1 = (char)(ssid.length() + password.length());
-        char c2 = (char)password.length();
-        byte[] localObject = new rev_Class_d().a();
+        char c1 = (char)(ssid.length() + password.length());    //v2
+        char c2 = (char)password.length();  //v3
+        byte[] localObject = new rev_Class_d().a(); //get 1,2,3,4,  //v4
         this.a = new byte[localObject.length][];
-        int i = 0;
-        if (i >= this.a.length) //todo
-        {
-  /*          localObject = new rev_Class_e(c1, ssid).b();
-            this.b = new byte[localObject.length][];
-            i = 0;
-            label87:
-            if (i < this.b.length) {
-                break label195;
-            }
-            localObject = new f(c2).b();
-            this.c = new byte[localObject.length][];
-            i = 0;
-            label124:
-            if (i < this.c.length) {
-                break label219;
-            }
-            ssid = new b(ssid, password).b();
-            this.d = new byte[ssid.length][];
-            i = j;*/
+
+        for (int i=0;i<this.a.length;i++){  //i:v0
+            this.a[i] = rev_Class_l_maybe_util.c(localObject[i]);//v5=this.a
         }
-        for (;;)
-        {
-     /*       if (i >= this.d.length)
-            {
-                return;
-                this.a[i] = rev_Class_l_maybe_util.c(localObject[i]);
-                i += 1;
-                break;
-                label195:
-                this.b[i] = rev_Class_l_maybe_util.c(localObject[i]);
-                i += 1;
-                break label87;
-                label219:
-                this.c[i] = rev_Class_l_maybe_util.c(localObject[i]);
-                i += 1;
-                break label124;
-            }
-            this.d[i] = rev_Class_l_maybe_util.c(ssid[i]);
-            i += 1;*/
+        char[] arrayOfChar = new rev_Class_e(c1, ssid).b(); //v2
+        this.b = new byte[arrayOfChar.length][];
+
+        for (int i=0;i<this.b.length;i++){
+            this.b[i] = rev_Class_l_maybe_util.c(arrayOfChar[i]);//v4=this.b
+        }
+        char[] arrayOfChar3=new f(c2).b();//v2
+        this.c = new byte[arrayOfChar3.length][];
+
+        for (int i=0;i<this.c.length;i++){
+            this.c[i] = rev_Class_l_maybe_util.c(arrayOfChar3[i]);//v3=this.c
+        }
+        char[] arrayOfChar4 = new b(ssid, password).b();//v0
+        this.d = new byte[arrayOfChar4.length][];
+
+        for (int i=0;i<this.d.length;i++){  //i:v1
+            this.d[i] = rev_Class_l_maybe_util.c(arrayOfChar4[i]);//v2=this.d
         }
     }
 

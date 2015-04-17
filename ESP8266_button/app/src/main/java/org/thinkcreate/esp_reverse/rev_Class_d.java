@@ -11,21 +11,17 @@ public class rev_Class_d {
 
     public String toString()
     {
-        StringBuilder localStringBuilder = new StringBuilder();
-        byte[] arrayOfByte = a();
-        int i = 0;
-        for (;;)
+        StringBuilder localStringBuilder = new StringBuilder(); //v1
+        byte[] arrayOfByte = a();   //v2
+        for (int i = 0;i<4;i++)    //v0
         {
-            if (i >= 4) {
-                return localStringBuilder.toString();
-            }
-            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);
+            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);  //v3
             localStringBuilder.append("0x");
             if (str.length() == 1) {
                 localStringBuilder.append("0");
             }
             localStringBuilder.append(str).append(" ");
-            i += 1;
         }
+        return localStringBuilder.toString();
     }
 }
