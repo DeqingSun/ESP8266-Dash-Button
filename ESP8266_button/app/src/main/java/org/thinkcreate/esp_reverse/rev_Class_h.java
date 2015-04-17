@@ -23,47 +23,30 @@ public class rev_Class_h {
 
     private boolean a(rev_Class_g_encoder_interface paramg)
     {
-        long l = System.currentTimeMillis();
-        int i = 0;
-        if ((this.b) || (i >= Long.MAX_VALUE))
-        {
-            label22:
-            i = 0;
-            label24:
-            if ((!this.b) && (i < 20L)) {
-          //      break label121;
-            }
-            i = 0;
-            label42:
-            if ((!this.b) && (i < 20L)) {
-         //       break label149;
-            }
-            i = 0;
-        }
-        for (;;)
-        {
-            if ((this.b) || (i >= Long.MAX_VALUE)) {}
-            label121:
-            label149:
-            do
-            {//todo
-                return this.a;
-         /*     //  this.c.a(paramg.a(), "255.255.255.255", 7001, 10L);
-                if (System.currentTimeMillis() - l > 2000L) {
-              //      break label22;
-                }
-                i += 1;
+        long l = System.currentTimeMillis();    //v7 low v8 high
+
+        for(int i=0; (!this.b) && (i < Long.MAX_VALUE) ;i++){    //i?
+            this.c.a(paramg.a(), "255.255.255.255", 7001, 10L);
+            if (System.currentTimeMillis() - l > 2000L){
                 break;
-                this.c.a(paramg.b(), "255.255.255.255", 7001, 10L);
-                i += 1;
-              //  break label24;
-                this.c.a(paramg.c(), "255.255.255.255", 7001, 10L);
-                i += 1;
-             //   break label42;
-                this.c.a(paramg.d(), "255.255.255.255", 7001, 10L);*/
-            } while (System.currentTimeMillis() - l > 6000L);
-           // i += 1;
+            }
         }
+
+        for(int i=0; (!this.b) && (i < 20L) ;i++){    //i?
+            this.c.a(paramg.b(), "255.255.255.255", 7001, 10L);
+        }
+
+        for(int i=0; (!this.b) && (i < 20L) ;i++){    //i?
+            this.c.a(paramg.c(), "255.255.255.255", 7001, 10L);
+        }
+
+        for(int i=0; (!this.b) && (i < Long.MAX_VALUE) ;i++){
+            this.c.a(paramg.d(), "255.255.255.255", 7001, 10L);
+            if (System.currentTimeMillis() - l > 6000L){
+                break;
+            }
+        }
+        return this.a;
     }
 
     private void c()
