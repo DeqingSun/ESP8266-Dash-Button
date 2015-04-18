@@ -1,12 +1,14 @@
 package org.thinkcreate.esp8266_button;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 
 public class MainActivity extends Activity implements View.OnClickListener{
@@ -57,8 +59,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if (activeESP_Touch_AsyncTask!=null){
             activeESP_Touch_AsyncTask.cancel(true);
         }
-        activeESP_Touch_AsyncTask=new ESP_Touch_AsyncTask(this, this, ssid,password);
-        activeESP_Touch_AsyncTask.execute();
+        if (activeESP_Touch_AsyncTask!=null && activeESP_Touch_AsyncTask.getStatus() == AsyncTask.Status.RUNNING){
+            Log.d(TAG, "Not cancelled yet");
+            Toast.makeText(getApplicationContext(), "Still killing old task\nplease try again", Toast.LENGTH_SHORT).show();
+        }else {
+            activeESP_Touch_AsyncTask = new ESP_Touch_AsyncTask(this, this, ssid, password);
+            activeESP_Touch_AsyncTask.execute();
+        }
     }
 
 }

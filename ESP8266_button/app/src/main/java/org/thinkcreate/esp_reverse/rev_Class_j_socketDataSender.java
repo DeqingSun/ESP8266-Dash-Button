@@ -33,7 +33,7 @@ public class rev_Class_j_socketDataSender {
         this.exceptionHappened = false;
     }
 
-    public void a(byte[][] paramArrayOfByte, String paramString, int portNum, long paramLong)
+    public boolean sendArrayOfDataArray(byte[][] paramArrayOfByte, String paramString, int portNum, long paramLong)
     {
         if ((paramArrayOfByte != null) && (paramArrayOfByte.length > 0)) {
             for (int i = 0; (!this.exceptionHappened) && (i < paramArrayOfByte.length) ; i++) {    //i:v0
@@ -70,6 +70,7 @@ public class rev_Class_j_socketDataSender {
                 closeSocket();
             }
         }
+        return this.exceptionHappened;
     }
 
     public void closeSocket()

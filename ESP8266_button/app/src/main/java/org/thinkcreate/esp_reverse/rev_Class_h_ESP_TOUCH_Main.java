@@ -25,23 +25,29 @@ public class rev_Class_h_ESP_TOUCH_Main {  //fixed
     {
         long l = System.currentTimeMillis();    //v7 low v8 high
 
+        boolean sendInterruptedSleep=false;
+
         for(int i=0; (!this.senderInterrupted) && (i < Long.MAX_VALUE) ;i++){    //i?
-            this.c_socketSender.a(paramg.a(), "255.255.255.255", 7001, 10L);
+            sendInterruptedSleep=this.c_socketSender.sendArrayOfDataArray(paramg.a(), "255.255.255.255", 7001, 10L);
+            if (sendInterruptedSleep) return this.validRespReceived;
             if (System.currentTimeMillis() - l > 2000L){
                 break;
             }
         }
 
         for(int i=0; (!this.senderInterrupted) && (i < 20L) ;i++){    //i?
-            this.c_socketSender.a(paramg.b(), "255.255.255.255", 7001, 10L);
+            sendInterruptedSleep=this.c_socketSender.sendArrayOfDataArray(paramg.b(), "255.255.255.255", 7001, 10L);
+            if (sendInterruptedSleep) return this.validRespReceived;
         }
 
         for(int i=0; (!this.senderInterrupted) && (i < 20L) ;i++){    //i?
-            this.c_socketSender.a(paramg.c(), "255.255.255.255", 7001, 10L);
+            sendInterruptedSleep=this.c_socketSender.sendArrayOfDataArray(paramg.c(), "255.255.255.255", 7001, 10L);
+            if (sendInterruptedSleep) return this.validRespReceived;
         }
 
         for(int i=0; (!this.senderInterrupted) && (i < Long.MAX_VALUE) ;i++){
-            this.c_socketSender.a(paramg.d(), "255.255.255.255", 7001, 10L);
+            sendInterruptedSleep=this.c_socketSender.sendArrayOfDataArray(paramg.d(), "255.255.255.255", 7001, 10L);
+            if (sendInterruptedSleep) return this.validRespReceived;
             if (System.currentTimeMillis() - l > 6000L){
                 break;
             }
@@ -63,7 +69,7 @@ public class rev_Class_h_ESP_TOUCH_Main {  //fixed
                 long l = System.currentTimeMillis();    //l:v0
                 int i = (byte)(ssidStr.length() + passwordStr.length());    //i:v2 paramh
 
-                while(true) {
+                while(!senderInterrupted) {
                     int j = d_socketReceiver.a();  //j:v3  get SendEncodedSSIDPWD data
                     if (j == i) {
                         int timeLeft = (int) (46000L - (System.currentTimeMillis() - l));

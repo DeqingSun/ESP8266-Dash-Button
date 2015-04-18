@@ -14,7 +14,6 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
     {
         private Activity b;
         private ProgressDialog c;
-        private activity_C_class_maybe_handle d;
         private final String ssidStr;
         private final String passwordStr;
         private boolean g;
@@ -65,6 +64,7 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
             this.g = true;
             this.d.a();
         }*/
+        Log.d(TAG, "Cancelled");
         ESPSender.a();
     }
 
