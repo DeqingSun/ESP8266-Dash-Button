@@ -9,8 +9,7 @@ public class rev_Class_l_maybe_util //OK
 {
     private static byte a()
     {
-        return 0;   //todo
-        //return (byte)(127 - new Random().nextInt(256));
+        return (byte)(127 - new Random().nextInt(256));
     }   //get random number
 
     public static byte a(byte highByte, byte LowByte)  //merge 2 byte as HHHHLLLL

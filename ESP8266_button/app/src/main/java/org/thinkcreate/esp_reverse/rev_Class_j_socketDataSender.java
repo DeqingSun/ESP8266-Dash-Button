@@ -43,7 +43,6 @@ public class rev_Class_j_socketDataSender {
                     {
                         DatagramPacket localDatagramPacket = new DatagramPacket(paramArrayOfByte[i], paramArrayOfByte[i].length, InetAddress.getByName(paramString), portNum);
                         this.mDatagramSocket.send(localDatagramPacket);
-                        System.out.println(localDatagramPacket.toString());
                         try
                         {
                             Thread.sleep(paramLong);
