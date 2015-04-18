@@ -10,11 +10,11 @@ import java.net.UnknownHostException;
 /**
  * Created by sundeqing on 4/16/15.
  */
-public class rev_Class_j {
+public class rev_Class_j_socketDataSender {
     private DatagramSocket mDatagramSocket;
     private volatile boolean exceptionHappened;
 
-    public rev_Class_j()
+    public rev_Class_j_socketDataSender()
     {
         try
         {
@@ -28,7 +28,7 @@ public class rev_Class_j {
         }
     }
 
-    public void a()
+    public void initializeSender()
     {
         this.exceptionHappened = false;
     }
@@ -68,18 +68,18 @@ public class rev_Class_j {
                 }
             }
             if (this.exceptionHappened) {
-                b();
+                closeSocket();
             }
         }
     }
 
-    public void b()
+    public void closeSocket()
     {
         this.mDatagramSocket.close();
     }
 
     protected void finalize() throws Throwable {
-        b();
+        closeSocket();
         super.finalize();
     }
 }

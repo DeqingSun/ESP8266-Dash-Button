@@ -40,6 +40,8 @@ public class rev_Class_c_ssidpwd_encoder
         for (int i=0;i<this.d.length;i++){  //i:v1
             this.d[i] = rev_Class_l_maybe_util.c(arrayOfChar4[i]);//v2=this.d
         }
+
+        //identical to origin, format are same, content should be random
     }
 
     public byte[][] a()
