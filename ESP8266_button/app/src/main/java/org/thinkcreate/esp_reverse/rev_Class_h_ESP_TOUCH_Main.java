@@ -5,15 +5,15 @@ import android.os.Looper;
 /**
  * Created by sundeqing on 4/16/15.
  */
-public class rev_Class_h {  //fixed
-    private volatile boolean a = false;
-    private volatile boolean b = false;
+public class rev_Class_h_ESP_TOUCH_Main {  //fixed
+    private volatile boolean validRespReceived = false;
+    private volatile boolean senderInterrupted = false;
     private final rev_Class_j_socketDataSender c_socketSender;
     private final rev_Class_k_UDP_server d_socketReceiver;
     private final String ssidStr;
     private final String passwordStr;
 
-    public rev_Class_h(String ssid, String password)
+    public rev_Class_h_ESP_TOUCH_Main(String ssid, String password)
     {
         this.ssidStr = ssid;
         this.passwordStr = password;
@@ -25,35 +25,35 @@ public class rev_Class_h {  //fixed
     {
         long l = System.currentTimeMillis();    //v7 low v8 high
 
-        for(int i=0; (!this.b) && (i < Long.MAX_VALUE) ;i++){    //i?
+        for(int i=0; (!this.senderInterrupted) && (i < Long.MAX_VALUE) ;i++){    //i?
             this.c_socketSender.a(paramg.a(), "255.255.255.255", 7001, 10L);
             if (System.currentTimeMillis() - l > 2000L){
                 break;
             }
         }
 
-        for(int i=0; (!this.b) && (i < 20L) ;i++){    //i?
+        for(int i=0; (!this.senderInterrupted) && (i < 20L) ;i++){    //i?
             this.c_socketSender.a(paramg.b(), "255.255.255.255", 7001, 10L);
         }
 
-        for(int i=0; (!this.b) && (i < 20L) ;i++){    //i?
+        for(int i=0; (!this.senderInterrupted) && (i < 20L) ;i++){    //i?
             this.c_socketSender.a(paramg.c(), "255.255.255.255", 7001, 10L);
         }
 
-        for(int i=0; (!this.b) && (i < Long.MAX_VALUE) ;i++){
+        for(int i=0; (!this.senderInterrupted) && (i < Long.MAX_VALUE) ;i++){
             this.c_socketSender.a(paramg.d(), "255.255.255.255", 7001, 10L);
             if (System.currentTimeMillis() - l > 6000L){
                 break;
             }
         }
-        return this.a;
+        return this.validRespReceived;
     }
 
-    private void c()
+    private void interruptSockets()
     {
-        this.b = true;
-        this.c_socketSender.initializeSender();
-        this.d_socketReceiver.b();
+        this.senderInterrupted = true;
+        this.c_socketSender.function_a();
+        this.d_socketReceiver.interruptSocketServer();
     }
 
     private void d(){
@@ -69,7 +69,7 @@ public class rev_Class_h {  //fixed
                         int timeLeft = (int) (46000L - (System.currentTimeMillis() - l));
                         if (timeLeft >= 0) {
                             d_socketReceiver.a(timeLeft); //set timeout
-                            a=true;
+                            validRespReceived =true;
                         }
                         break;
                     } else if (j == -128) {
@@ -77,7 +77,7 @@ public class rev_Class_h {  //fixed
                     }
                 }
                 a();
-                d_socketReceiver.c();  //close socket
+                d_socketReceiver.closeSocket();  //close socket
             }
 
         };
@@ -86,7 +86,7 @@ public class rev_Class_h {  //fixed
 
     public void a()
     {
-        c();
+        interruptSockets();
     }
 
     public boolean b()

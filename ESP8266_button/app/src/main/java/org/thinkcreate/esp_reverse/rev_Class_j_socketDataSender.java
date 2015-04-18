@@ -28,7 +28,7 @@ public class rev_Class_j_socketDataSender {
         }
     }
 
-    public void initializeSender()
+    public void function_a()
     {
         this.exceptionHappened = false;
     }

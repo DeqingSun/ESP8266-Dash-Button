@@ -43,6 +43,8 @@ public class rev_Class_k_UDP_server {
         catch (IOException localIOException)
         {
             localIOException.printStackTrace();
+        }catch (NullPointerException e){
+            e.printStackTrace();
         }
         return Byte.MIN_VALUE;
     }
@@ -61,19 +63,23 @@ public class rev_Class_k_UDP_server {
         return false;
     }
 
-    public void b()
+    public void interruptSocketServer()
     {
         Log.i("UDPSocketServer", "USPSocketServer is interrupt");
-        c();
+        closeSocket();
     }
 
-    public void c()
+    public void closeSocket()
     {
-        this.b.close();
+        try {
+            this.b.close();
+        }catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 
     protected void finalize() throws Throwable {
-        c();
+        closeSocket();
         super.finalize();
     }
 }

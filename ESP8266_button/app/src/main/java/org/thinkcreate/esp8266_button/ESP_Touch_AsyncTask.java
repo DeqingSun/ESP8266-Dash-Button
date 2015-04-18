@@ -2,13 +2,10 @@ package org.thinkcreate.esp8266_button;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
-import org.thinkcreate.esp_reverse.rev_Class_h;
+import org.thinkcreate.esp_reverse.rev_Class_h_ESP_TOUCH_Main;
 
 /**
  * Created by sundeqing on 4/16/15.
@@ -22,7 +19,7 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
         private final String passwordStr;
         private boolean g;
         private static final String TAG = "ESP_Touch_AsyncTask";
-        private rev_Class_h ESPSender;
+        private rev_Class_h_ESP_TOUCH_Main ESPSender;
 
         public ESP_Touch_AsyncTask(MainActivity paramEspTouchActivity, Activity paramActivity, String ssid, String password)
         {
@@ -30,7 +27,7 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
             this.g = false;
             this.ssidStr = ssid;
             this.passwordStr = password;
-            this.ESPSender=new rev_Class_h(ssid, password);
+            this.ESPSender=new rev_Class_h_ESP_TOUCH_Main(ssid, password);
           //  this.d = new activity_C_class_maybe_handle(this.ssidStr, this.passwordStr);
         }
 
