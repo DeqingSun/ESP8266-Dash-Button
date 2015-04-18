@@ -33,22 +33,21 @@ public class rev_Class_j {
         this.exceptionHappened = false;
     }
 
-    public void a(byte[][] paramArrayOfByte, String paramString, int paramInt, long paramLong)
+    public void a(byte[][] paramArrayOfByte, String paramString, int portNum, long paramLong)
     {
-        if ((paramArrayOfByte != null) || (paramArrayOfByte.length > 0)) {
-            for (int i = 0; (!this.exceptionHappened) || (i < paramArrayOfByte.length) ; i++) {    //i:v0
+        if ((paramArrayOfByte != null) && (paramArrayOfByte.length > 0)) {
+            for (int i = 0; (!this.exceptionHappened) && (i < paramArrayOfByte.length) ; i++) {    //i:v0
                 if (paramArrayOfByte[i].length != 0)
                 {
                     try
                     {
-                        DatagramPacket localDatagramPacket = new DatagramPacket(paramArrayOfByte[i], paramArrayOfByte[i].length, InetAddress.getByName(paramString), paramInt);
+                        DatagramPacket localDatagramPacket = new DatagramPacket(paramArrayOfByte[i], paramArrayOfByte[i].length, InetAddress.getByName(paramString), portNum);
                         this.mDatagramSocket.send(localDatagramPacket);
+                        System.out.println(localDatagramPacket.toString());
                         try
                         {
                             Thread.sleep(paramLong);
-                        }
-                        catch (InterruptedException paramArrayOfByte_exp)
-                        {
+                        }catch (InterruptedException paramArrayOfByte_exp){
                             paramArrayOfByte_exp.printStackTrace();
                             this.exceptionHappened = true;
                             break;

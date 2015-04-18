@@ -1,5 +1,6 @@
 package org.thinkcreate.esp8266_button;
 
+import org.thinkcreate.esp_reverse.rev_Class_h;
 import org.thinkcreate.esp_reverse.rev_Class_m;
 
 /**
@@ -12,6 +13,7 @@ public class testClass {
     public testClass(){
         //rev_Class_m temp = new rev_Class_m();
         //temp.update(a,1,1);
-        new activity_C_class_maybe_handle("SSID123", "Password456");
+        new rev_Class_h("SSID123", "Password456").b();
+
     }
 }

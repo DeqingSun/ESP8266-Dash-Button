@@ -13,6 +13,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button mButton1;
     private static final String TAG = "ESP8266_Button";
+    private ESP_Touch_AsyncTask activeESP_Touch_AsyncTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
         Log.d(TAG, "YES");
         String ssid="ssid",password="pass";
         //new activity_B_class(this, this, ssid, password).execute(new String[0]);
-        testClass test = new testClass();
+        //testClass test = new testClass();
+        if (activeESP_Touch_AsyncTask!=null){
+            activeESP_Touch_AsyncTask.cancel(true);
+        }
+        activeESP_Touch_AsyncTask=new ESP_Touch_AsyncTask(this, this, ssid,password);
+        activeESP_Touch_AsyncTask.execute();
     }
 
 }

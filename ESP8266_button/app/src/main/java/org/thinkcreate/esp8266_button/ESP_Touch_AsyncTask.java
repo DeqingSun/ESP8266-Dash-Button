@@ -5,12 +5,15 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
+
+import org.thinkcreate.esp_reverse.rev_Class_h;
 
 /**
  * Created by sundeqing on 4/16/15.
  */
-public class activity_B_class  extends AsyncTask
+public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
     {
         private Activity b;
         private ProgressDialog c;
@@ -18,14 +21,17 @@ public class activity_B_class  extends AsyncTask
         private final String ssidStr;
         private final String passwordStr;
         private boolean g;
+        private static final String TAG = "ESP_Touch_AsyncTask";
+        private rev_Class_h ESPSender;
 
-        public activity_B_class(MainActivity paramEspTouchActivity, Activity paramActivity, String ssid, String password)
+        public ESP_Touch_AsyncTask(MainActivity paramEspTouchActivity, Activity paramActivity, String ssid, String password)
         {
             this.b = paramActivity;
             this.g = false;
             this.ssidStr = ssid;
             this.passwordStr = password;
-            this.d = new activity_C_class_maybe_handle(this.ssidStr, this.passwordStr);
+            this.ESPSender=new rev_Class_h(ssid, password);
+          //  this.d = new activity_C_class_maybe_handle(this.ssidStr, this.passwordStr);
         }
 
     protected Boolean a(String... paramVarArgs)
@@ -36,11 +42,11 @@ public class activity_B_class  extends AsyncTask
 
     protected void a(Boolean paramBoolean)
     {
-        this.c.dismiss();
+      //  this.c.dismiss();
         int i;
-        if (paramBoolean.booleanValue()) {
-            i = 2131427563;
-        }
+      //  if (paramBoolean.booleanValue()) {
+     //       i = 2131427563;
+     //   }
         /*for (;;)
         {
           //  Toast.makeText(this.b, i, 1).show();
@@ -55,18 +61,21 @@ public class activity_B_class  extends AsyncTask
         }*/
     }
 
-    public void onCancel(DialogInterface paramDialogInterface)
+    public void onCancelled(Boolean result)
     {
-        if (this.d != null)
+      /*  if (this.d != null)
         {
             this.g = true;
             this.d.a();
-        }
+        }*/
+        ESPSender.a();
     }
 
+
         @Override
-        protected Object doInBackground(Object[] objects) {
-            return null;
+        protected Boolean doInBackground(Void... voids) {
+            Log.d(TAG, "Background");
+            return ESPSender.b();
         }
 
         protected void onPreExecute()
@@ -76,7 +85,13 @@ public class activity_B_class  extends AsyncTask
         this.c.setCanceledOnTouchOutside(false);
         this.c.setOnCancelListener(this);
         this.c.show();*/
+        Log.d(TAG, "PRE EXE");
     }
 
+        @Override
+        protected void onPostExecute(Boolean result) {
+            Log.d(TAG, "POST");
+        }
 
-}
+
+    }
