@@ -53,7 +53,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     public void onClick(View v) {
         Log.d(TAG, "YES");
-        String ssid="Buffalo-G-5E60",password="a";
+        String ssid = getResources().getString(R.string.default_SSID);
+        String password = getResources().getString(R.string.default_password);
         //new activity_B_class(this, this, ssid, password).execute(new String[0]);
         //testClass test = new testClass();
         if (activeESP_Touch_AsyncTask!=null){
