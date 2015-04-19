@@ -88,6 +88,7 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
         @Override
         protected void onPostExecute(Boolean result) {
             Log.d(TAG, "POST");
+            Log.d(TAG, result?"SET OK":"SET Failed");
         }
 
 
