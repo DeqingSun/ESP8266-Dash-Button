@@ -42,6 +42,41 @@ void ICACHE_FLASH_ATTR some_timerfunc(void *arg)
 }
 
 
+
+void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
+{
+    static uint32 last_edge_time=0;
+	static uint8 last_key_state=255;
+	uint32 current_time;
+	uint32 gpio_status;
+	
+	gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
+	//clear interrupt status
+	GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
+	//os_printf("%04X\n",gpio_input_get());
+	
+	current_time=system_get_time();
+	
+	
+	
+	if (GPIO_INPUT_GET(14)){
+		if (last_key_state!=0 && (current_time-last_edge_time)>5000){
+			last_key_state=0;
+			os_printf("Released\n");
+			last_edge_time=current_time;
+		}
+	}else{	//pressed
+		if (last_key_state!=1 && (current_time-last_edge_time)>5000){
+			last_key_state=1;
+			os_printf("Pressed\n");
+			last_edge_time=current_time;
+		}
+	}
+		
+	
+}
+
+
 void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 {
 	switch(wifi_station_get_connect_status()){
@@ -114,11 +149,19 @@ void user_init(void)
 	
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
 	
-	GPIO_DIS_OUTPUT(14);	//Set GPIO2 to Input
+	GPIO_DIS_OUTPUT(14);	//Set GPIO14 to Input
 	
 	//PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);	//functional on P14
 	//PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
 	//PIN_PULLDWN_EN(PERIPHS_IO_MUX_MTMS_U);
+	
+	ETS_GPIO_INTR_DISABLE(); // Disable gpio interrupts
+	ETS_GPIO_INTR_ATTACH(button_intr_handler, 14); // GPIO14 interrupt handler
+	GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, BIT(12)); // Clear GPIO14 status
+	gpio_pin_intr_state_set(GPIO_ID_PIN(14), GPIO_PIN_INTR_ANYEDGE); // Interrupt on any GPIO14 edge
+	ETS_GPIO_INTR_ENABLE(); // Enable gpio interrupts
+	
+	
 	
 	os_timer_disarm(&some_timer);
     os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
