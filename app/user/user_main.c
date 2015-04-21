@@ -21,21 +21,51 @@ extern struct spi_config spi_config_buffer;
 
 #define user_procTaskPrio        0
 #define user_procTaskQueueLen    1
-static volatile os_timer_t some_timer;
+static volatile os_timer_t some_timer,check_wifi_timer;
 os_event_t    user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
 
-void some_timerfunc(void *arg)
+void ICACHE_FLASH_ATTR some_timerfunc(void *arg)
 {
 
+
+
+	if (0){
 		if (GPIO_INPUT_GET(14)){
 			os_printf("P14 HIGH\n");
 		}else{
 			os_printf("P14 LOW\n");
 		}
 		//os_printf("%04X\n",gpio_input_get());
-		
+	}	
+	
    //os_timer_arm(&some_timer, 1000, 0);
+}
+
+void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
+{
+	switch(wifi_station_get_connect_status()){
+		case STATION_IDLE:
+			os_printf("STATION_IDLE, STOP\n");
+			break;
+		case STATION_CONNECTING:
+			//os_printf("STATION_CONNECTING\n");
+			os_timer_arm(&check_wifi_timer, 100, 0);
+			break;
+		case STATION_WRONG_PASSWORD:
+			os_printf("STATION_WRONG_PASSWORD, STOP\n");
+			break;	
+		case STATION_NO_AP_FOUND:
+			os_printf("STATION_NO_AP_FOUND, STOP\n");
+			break;
+		case STATION_CONNECT_FAIL:
+			os_printf("STATION_CONNECT_FAIL, STOP\n");
+			break;
+		case STATION_GOT_IP:
+			os_printf("STATION_GOT_IP\n");
+			break;
+	}
+	//os_printf("CHECK\n");
 }
 
 //Do nothing function
@@ -76,6 +106,10 @@ void user_init(void)
 	
 	os_timer_disarm(&some_timer);
     os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
+	os_timer_disarm(&check_wifi_timer);
+    os_timer_setfn(&check_wifi_timer, (os_timer_func_t *)check_wifi_timerfunc, NULL);
+	
+	
 	
 	
 	if (readAndCheckSpiSetting()){
@@ -88,9 +122,8 @@ void user_init(void)
 			wifi_set_opmode(STATION_MODE);
 			if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");
 			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");
-			//os_timer_arm(&some_timer, 1000, 0);
-			
-			os_printf("START\n");
+			os_timer_arm(&check_wifi_timer, 100, 0);
+			os_printf("Try to connect to wifi\n");
 		}else{
 			os_printf("14 LOW\n");
 			wifi_set_opmode(STATION_MODE);
