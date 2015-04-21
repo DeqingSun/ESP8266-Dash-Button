@@ -74,21 +74,22 @@ static void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip,
 	os_printf("DST: %d.%d.%d.%d",
   *((uint8 *)&ip->addr), *((uint8 *)&ip->addr + 1),
   *((uint8 *)&ip->addr + 2), *((uint8 *)&ip->addr + 3));
+    conn->type=ESPCONN_TCP;
+    conn->state=ESPCONN_NONE;
+    conn->proto.tcp=&tcp;
+    conn->proto.tcp->local_port=espconn_port();
+    conn->proto.tcp->remote_port=80;
+    os_memcpy(conn->proto.tcp->remote_ip, &ip->addr, 4);
+    espconn_regist_connectcb(conn, networkConnectedCb);
+    espconn_regist_disconcb(conn, networkDisconCb);
+    espconn_regist_reconcb(conn, networkReconCb);
+    espconn_regist_recvcb(conn, networkRecvCb);
+    espconn_regist_sentcb(conn, networkSentCb);
+    espconn_connect(conn);
   }
 
  
-  conn->type=ESPCONN_TCP;
-  conn->state=ESPCONN_NONE;
-  conn->proto.tcp=&tcp;
-  conn->proto.tcp->local_port=espconn_port();
-  conn->proto.tcp->remote_port=80;
-  os_memcpy(conn->proto.tcp->remote_ip, &ip->addr, 4);
-  espconn_regist_connectcb(conn, networkConnectedCb);
-  espconn_regist_disconcb(conn, networkDisconCb);
-  espconn_regist_reconcb(conn, networkReconCb);
-  espconn_regist_recvcb(conn, networkRecvCb);
-  espconn_regist_sentcb(conn, networkSentCb);
-  espconn_connect(conn);
+
 }
 
 void ICACHE_FLASH_ATTR connect_URL(char *url){
