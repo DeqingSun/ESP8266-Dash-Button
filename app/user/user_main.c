@@ -12,6 +12,9 @@
 #include "osapi.h"
 #include "gpio.h"
 
+#include "ip_addr.h"	//this need to be included before espconn
+#include "espconn.h"
+
 #include "user_interface.h"
 #include "smartconfig.h"
 
@@ -24,6 +27,10 @@ extern struct spi_config spi_config_buffer;
 static volatile os_timer_t some_timer,check_wifi_timer;
 os_event_t    user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
+
+struct espconn request_conn;
+ip_addr_t request_ip;
+esp_tcp tcp;
 
 void ICACHE_FLASH_ATTR some_timerfunc(void *arg)
 {
@@ -40,6 +47,88 @@ void ICACHE_FLASH_ATTR some_timerfunc(void *arg)
 	}	
 	
    //os_timer_arm(&some_timer, 1000, 0);
+}
+
+
+static void ICACHE_FLASH_ATTR networkSentCb(void *arg) {
+  os_printf("sent\n");
+}
+ 
+static void ICACHE_FLASH_ATTR networkRecvCb(void *arg, char *data, unsigned short len) {
+  os_printf("recv\n");
+   
+  struct espconn *conn=(struct espconn *)arg;
+  int x;
+  
+  {
+	char buf[32];
+	int i=0;
+	int ptr=0;
+	for (i=0;i<len;i++){
+		os_printf("%c",data[i]);
+		//buf[ptr++]=data[i++];
+		/*if (ptr==31){
+			buf[ptr]='\0';
+			os_printf("%s",buf);
+			ptr=0;
+		}*/
+	}
+	os_printf("\n");
+  }
+  
+  
+  //uart0_tx_buffer(data,len);
+  //for (x=0; x<len; x++) networkParseChar(conn, data[x]);
+}
+ 
+static void ICACHE_FLASH_ATTR networkConnectedCb(void *arg) {
+ 
+  os_printf("conn\n");
+  struct espconn *conn=(struct espconn *)arg;
+ 
+  char *data = "GET / HTTP/1.0\r\n\r\n\r\n";
+  sint8 d = espconn_sent(conn,data,strlen(data));
+ 
+  espconn_regist_recvcb(conn, networkRecvCb);
+  os_printf("cend\n");
+}
+ 
+static void ICACHE_FLASH_ATTR networkReconCb(void *arg, sint8 err) {
+  os_printf("rcon\n");
+//  os_printf("Reconnect\n\r");
+//  network_init();
+}
+ 
+static void ICACHE_FLASH_ATTR networkDisconCb(void *arg) {
+  os_printf("dcon\n");
+//  os_printf("Disconnect\n\r");
+//  network_init();
+}
+
+
+void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip, void *arg) {
+  struct espconn *conn=(struct espconn *)arg;
+  if (ip==NULL) {
+    os_printf("Nslookup failed ERR\n");
+  }else{
+	os_printf("DST: %d.%d.%d.%d",
+  *((uint8 *)&ip->addr), *((uint8 *)&ip->addr + 1),
+  *((uint8 *)&ip->addr + 2), *((uint8 *)&ip->addr + 3));
+  }
+
+ 
+  conn->type=ESPCONN_TCP;
+  conn->state=ESPCONN_NONE;
+  conn->proto.tcp=&tcp;
+  conn->proto.tcp->local_port=espconn_port();
+  conn->proto.tcp->remote_port=80;
+  os_memcpy(conn->proto.tcp->remote_ip, &ip->addr, 4);
+  espconn_regist_connectcb(conn, networkConnectedCb);
+  espconn_regist_disconcb(conn, networkDisconCb);
+  espconn_regist_reconcb(conn, networkReconCb);
+  espconn_regist_recvcb(conn, networkRecvCb);
+  espconn_regist_sentcb(conn, networkSentCb);
+  espconn_connect(conn);
 }
 
 void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
@@ -63,6 +152,17 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 			break;
 		case STATION_GOT_IP:
 			os_printf("STATION_GOT_IP\n");
+			{
+				struct ip_info ipConfig;
+				wifi_get_ip_info(STATION_IF, &ipConfig);
+				if (ipConfig.ip.addr != 0){
+					espconn_gethostbyname(&request_conn,"blank.org", &request_ip, user_dns_found_CB);
+				}else{
+					os_printf("IP IS ZERO!\n");
+					
+				}
+			}
+			
 			break;
 	}
 	//os_printf("CHECK\n");
@@ -123,7 +223,7 @@ void user_init(void)
 			if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");
 			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");
 			os_timer_arm(&check_wifi_timer, 100, 0);
-			os_printf("Try to connect to wifi\n");
+			os_printf("TRY to connect to WIFI\n");
 		}else{
 			os_printf("14 LOW\n");
 			wifi_set_opmode(STATION_MODE);
