@@ -17,6 +17,7 @@
 
 #include "access_spiflash.h"
 #include "access_web.h"
+#include "url_parser.h"
 
 extern struct spi_config spi_config_buffer;
 
@@ -66,7 +67,12 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 				struct ip_info ipConfig;
 				wifi_get_ip_info(STATION_IF, &ipConfig);
 				if (ipConfig.ip.addr != 0){
-					connect_URL("blank.org");
+					///connect_URL("blank.org");
+					//connect_URL("173.192.121.250");
+					//connect_URL("4.35.21.158/intl/en/about/");
+					connect_URL("retro.hackaday.com/retro.html");
+					
+					
 				}else{
 					os_printf("IP IS ZERO!\n");
 					
@@ -118,9 +124,6 @@ void user_init(void)
     os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
 	os_timer_disarm(&check_wifi_timer);
     os_timer_setfn(&check_wifi_timer, (os_timer_func_t *)check_wifi_timerfunc, NULL);
-	
-	
-	
 	
 	if (readAndCheckSpiSetting()){
 		os_printf("Ready to rock\n");

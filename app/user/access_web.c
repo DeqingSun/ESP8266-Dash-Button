@@ -1,4 +1,5 @@
 #include "access_web.h"
+#include "url_parser.h"
 
 #include "osapi.h"
 
@@ -9,13 +10,19 @@ struct espconn request_conn;
 ip_addr_t request_ip;
 esp_tcp tcp;
 
+extern char url_host[];
+extern char url_abs_path[];
+extern uint16 url_port;
+extern bool host_is_IP;
+extern ip_addr_t host_ip;
+
 
 static void ICACHE_FLASH_ATTR networkSentCb(void *arg) {
-  os_printf("sent\n");
+  os_printf("networkSentCb\n");
 }
  
 static void ICACHE_FLASH_ATTR networkRecvCb(void *arg, char *data, unsigned short len) {
-  os_printf("recv\n");
+  os_printf("networkRecvCb\n");
    
   struct espconn *conn=(struct espconn *)arg;
   int x;
@@ -42,25 +49,31 @@ static void ICACHE_FLASH_ATTR networkRecvCb(void *arg, char *data, unsigned shor
 }
  
 static void ICACHE_FLASH_ATTR networkConnectedCb(void *arg) {
- 
-  os_printf("conn\n");
+  char outbuf[192];
+  os_printf("networkConnectedCb\n");
   struct espconn *conn=(struct espconn *)arg;
  
-  char *data = "GET / HTTP/1.0\r\n\r\n\r\n";
-  sint8 d = espconn_sent(conn,data,os_strlen(data));
+  if (host_is_IP){
+    os_sprintf(outbuf,"GET %s HTTP/1.0\r\n\r\n\r\n",url_abs_path);
+  }else{
+    os_sprintf(outbuf,"GET %s HTTP/1.1\r\nHost: %s\r\n\r\n",url_abs_path,url_host);
+  }
+  
+  sint8 d = espconn_sent(conn,outbuf,os_strlen(outbuf));
  
   espconn_regist_recvcb(conn, networkRecvCb);
   os_printf("cend\n");
 }
  
 static void ICACHE_FLASH_ATTR networkReconCb(void *arg, sint8 err) {
-  os_printf("rcon\n");
+  os_printf("networkReconCb\n");	//this will be called if connection Failed
+  os_printf("RECONNECT ERR\n");
 //  os_printf("Reconnect\n\r");
 //  network_init();
 }
  
 static void ICACHE_FLASH_ATTR networkDisconCb(void *arg) {
-  os_printf("dcon\n");
+  os_printf("networkDisconCb\n");
 //  os_printf("Disconnect\n\r");
 //  network_init();
 }
@@ -71,21 +84,23 @@ static void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip,
   if (ip==NULL) {
     os_printf("Nslookup failed ERR\n");
   }else{
-	os_printf("DST: %d.%d.%d.%d",
+	os_printf("DST: %d.%d.%d.%d\n",
   *((uint8 *)&ip->addr), *((uint8 *)&ip->addr + 1),
   *((uint8 *)&ip->addr + 2), *((uint8 *)&ip->addr + 3));
     conn->type=ESPCONN_TCP;
     conn->state=ESPCONN_NONE;
     conn->proto.tcp=&tcp;
     conn->proto.tcp->local_port=espconn_port();
-    conn->proto.tcp->remote_port=80;
+    conn->proto.tcp->remote_port=url_port;
     os_memcpy(conn->proto.tcp->remote_ip, &ip->addr, 4);
     espconn_regist_connectcb(conn, networkConnectedCb);
     espconn_regist_disconcb(conn, networkDisconCb);
     espconn_regist_reconcb(conn, networkReconCb);
     espconn_regist_recvcb(conn, networkRecvCb);
     espconn_regist_sentcb(conn, networkSentCb);
-    espconn_connect(conn);
+    if (espconn_connect(conn)!=0){
+	  os_printf("espconn_connect ERR\n");
+	}
   }
 
  
@@ -93,6 +108,14 @@ static void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip,
 }
 
 void ICACHE_FLASH_ATTR connect_URL(char *url){
-	espconn_gethostbyname(&request_conn,url, &request_ip, user_dns_found_CB);
+	uint8 result;
+	parse_URL(url);
+	
+	if (host_is_IP){	//skip DNS, call callback directly
+		user_dns_found_CB(url_host, &host_ip, &request_conn);
+	}else{
+		result = espconn_gethostbyname(&request_conn,url_host, &request_ip, user_dns_found_CB);
+		//os_printf("espconn_DNS %d\n",result);
+	}
 }
 
