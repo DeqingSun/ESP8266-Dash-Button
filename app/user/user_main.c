@@ -35,7 +35,7 @@ void some_timerfunc(void *arg)
 		}
 		//os_printf("%04X\n",gpio_input_get());
 		
-   // os_timer_arm(&some_timer, 1000, 0);
+   //os_timer_arm(&some_timer, 1000, 0);
 }
 
 //Do nothing function
@@ -74,15 +74,23 @@ void user_init(void)
 	//PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
 	//PIN_PULLDWN_EN(PERIPHS_IO_MUX_MTMS_U);
 	
+	os_timer_disarm(&some_timer);
+    os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
 	
 	
 	if (readAndCheckSpiSetting()){
 		os_printf("Ready to rock\n");
 		os_printf("SSID: %s\n",spi_config_buffer.config.ssid);
 		os_printf("PASSWORD: %s\n",spi_config_buffer.config.password);
-		
+		os_printf("BSSID_set: %d\n",spi_config_buffer.config.bssid_set);
 		if (GPIO_INPUT_GET(14)){
 			os_printf("14 HIGH\n");
+			wifi_set_opmode(STATION_MODE);
+			if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");
+			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");
+			//os_timer_arm(&some_timer, 1000, 0);
+			
+			os_printf("START\n");
 		}else{
 			os_printf("14 LOW\n");
 			wifi_set_opmode(STATION_MODE);
@@ -95,9 +103,9 @@ void user_init(void)
 		smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
 	}
 	
-	os_timer_disarm(&some_timer);
+/*	os_timer_disarm(&some_timer);
     os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
-	os_timer_arm(&some_timer, 1000, 0);
+	os_timer_arm(&some_timer, 1000, 0);*/
 	//system_os_task(user_procTask, user_procTaskPrio,user_procTaskQueue, user_procTaskQueueLen);
 //	system_os_post(user_procTaskPrio, 0, 0 );
 }
