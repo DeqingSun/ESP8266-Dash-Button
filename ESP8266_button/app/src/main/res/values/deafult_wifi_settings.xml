@@ -2,4 +2,5 @@
 <resources>
     <string name="default_SSID">OpenWrt_TEST</string>
     <string name="default_password">12345678</string>
+    <string name="default_URL">blank.org</string>
 </resources>
