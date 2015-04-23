@@ -72,21 +72,30 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 			break;
 		case STATION_GOT_IP:
 			os_printf("STATION_GOT_IP\n");
-			{
-				struct ip_info ipConfig;
-				wifi_get_ip_info(STATION_IF, &ipConfig);
-				if (ipConfig.ip.addr != 0){
-					///connect_URL("blank.org");
-					//connect_URL("173.192.121.250");
-					//connect_URL("4.35.21.158/intl/en/about/");
-					connect_URL("retro.hackaday.com/retro.html");
-					
-					
-				}else{
-					os_printf("IP IS ZERO!\n");
-					
-				}
+			switch (get_state()){
+				case BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL:{
+						struct ip_info ipConfig;
+						wifi_get_ip_info(STATION_IF, &ipConfig);
+						if (ipConfig.ip.addr != 0){
+							///connect_URL("blank.org");
+							//connect_URL("173.192.121.250");
+							//connect_URL("4.35.21.158/intl/en/about/");
+							connect_URL("retro.hackaday.com/retro.html");
+							
+							
+						}else{
+							os_printf("IP IS ZERO!\n");
+							change_state(BUTTONSTATE_ERR_WIFI_FAILED);
+							wifi_station_disconnect();//Stop trying
+						}
+					}
+					break;
+				case BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER:{
+					os_printf("UDP!\n");
+					}
+					break;
 			}
+			
 			
 			break;
 	}
@@ -104,7 +113,7 @@ void ICACHE_FLASH_ATTR
 smartconfig_done(void *data)
 {
 	struct station_config *sta_conf = data;
-	change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP);
+	change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER);
 	os_memcpy(&spi_config_buffer.config, sta_conf, sizeof(struct station_config));
 	
 	if(!writeSpiSetting()) os_printf("SPI write ERR\n");
@@ -115,11 +124,19 @@ smartconfig_done(void *data)
 	os_timer_arm(&check_wifi_timer, 100, 0);
 }
 
+void ICACHE_FLASH_ATTR
+startUDPserver(void){
+	smartconfig_stop();	
+	wifi_station_connect();
+	os_timer_arm(&check_wifi_timer, 100, 0);
+}
+
 void user_init(void)
 {
 	system_timer_reinit();
     os_printf("SDK version:%s\n", system_get_sdk_version());
 	change_state(BUTTONSTATE_BOOT);
+	register_button_Callback(startUDPserver);
 	
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
 	
@@ -154,7 +171,7 @@ void user_init(void)
 			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");	//this shouldn't happen
 			os_timer_arm(&check_wifi_timer, 100, 0);
 			os_printf("TRY to connect to WIFI\n");
-			change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP);
+			change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL);
 		}else{
 			os_printf("14 LOW\n");
 			wifi_set_opmode(STATION_MODE);
