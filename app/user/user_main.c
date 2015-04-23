@@ -18,6 +18,7 @@
 #include "access_spiflash.h"
 #include "access_web.h"
 #include "url_parser.h"
+#include "button_n_phase.h"
 
 extern struct spi_config spi_config_buffer;
 
@@ -42,46 +43,13 @@ void ICACHE_FLASH_ATTR some_timerfunc(void *arg)
 }
 
 
-
-void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
-{
-    static uint32 last_edge_time=0;
-	static uint8 last_key_state=255;
-	uint32 current_time;
-	uint32 gpio_status;
-	
-	gpio_status = GPIO_REG_READ(GPIO_STATUS_ADDRESS);
-	//clear interrupt status
-	GPIO_REG_WRITE(GPIO_STATUS_W1TC_ADDRESS, gpio_status);
-	//os_printf("%04X\n",gpio_input_get());
-	
-	current_time=system_get_time();
-	
-	
-	
-	if (GPIO_INPUT_GET(14)){
-		if (last_key_state!=0 && (current_time-last_edge_time)>5000){
-			last_key_state=0;
-			os_printf("Released\n");
-			last_edge_time=current_time;
-		}
-	}else{	//pressed
-		if (last_key_state!=1 && (current_time-last_edge_time)>5000){
-			last_key_state=1;
-			os_printf("Pressed\n");
-			last_edge_time=current_time;
-		}
-	}
-		
-	
-}
-
-
 void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 {
 	switch(wifi_station_get_connect_status()){
 		case STATION_IDLE:
 			os_printf("STATION_IDLE, STOP\n");
+			change_state(BUTTONSTATE_ERR_WIFI_FAILED);
+			wifi_station_disconnect();//Stop trying
 			break;
 		case STATION_CONNECTING:
 			//os_printf("STATION_CONNECTING\n");
@@ -89,12 +57,18 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 			break;
 		case STATION_WRONG_PASSWORD:
 			os_printf("STATION_WRONG_PASSWORD, STOP\n");
+			change_state(BUTTONSTATE_ERR_WIFI_FAILED);
+			wifi_station_disconnect();//Stop trying
 			break;	
 		case STATION_NO_AP_FOUND:
 			os_printf("STATION_NO_AP_FOUND, STOP\n");
+			change_state(BUTTONSTATE_ERR_WIFI_FAILED);
+			wifi_station_disconnect();//Stop trying
 			break;
 		case STATION_CONNECT_FAIL:
 			os_printf("STATION_CONNECT_FAIL, STOP\n");
+			change_state(BUTTONSTATE_ERR_WIFI_FAILED);
+			wifi_station_disconnect();//Stop trying
 			break;
 		case STATION_GOT_IP:
 			os_printf("STATION_GOT_IP\n");
@@ -138,14 +112,15 @@ smartconfig_done(void *data)
 	wifi_station_set_config(sta_conf);
 	wifi_station_disconnect();
 	wifi_station_connect();
+	os_timer_arm(&check_wifi_timer, 100, 0);
+	change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP);
 }
 
 void user_init(void)
 {
+	system_timer_reinit();
     os_printf("SDK version:%s\n", system_get_sdk_version());
-
-    
-    //smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
+	change_state(BUTTONSTATE_BOOT);
 	
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
 	
@@ -176,20 +151,21 @@ void user_init(void)
 		if (GPIO_INPUT_GET(14)){
 			os_printf("14 HIGH\n");
 			wifi_set_opmode(STATION_MODE);
-			if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");
-			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");
+			if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");	//this shouldn't happen
+			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");	//this shouldn't happen
 			os_timer_arm(&check_wifi_timer, 100, 0);
 			os_printf("TRY to connect to WIFI\n");
+			change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP);
 		}else{
 			os_printf("14 LOW\n");
 			wifi_set_opmode(STATION_MODE);
 			smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
+			change_state(BUTTONSTATE_ESPTOUCH);
 		}
 		
 		
 	}else{
-		wifi_set_opmode(STATION_MODE);
-		smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
+		change_state(BUTTONSTATE_ERR_SPIDATA_INVALID);
 	}
 	
 /*	os_timer_disarm(&some_timer);
