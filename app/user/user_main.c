@@ -104,7 +104,7 @@ void ICACHE_FLASH_ATTR
 smartconfig_done(void *data)
 {
 	struct station_config *sta_conf = data;
-	
+	change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP);
 	os_memcpy(&spi_config_buffer.config, sta_conf, sizeof(struct station_config));
 	
 	if(!writeSpiSetting()) os_printf("SPI write ERR\n");
@@ -113,7 +113,6 @@ smartconfig_done(void *data)
 	wifi_station_disconnect();
 	wifi_station_connect();
 	os_timer_arm(&check_wifi_timer, 100, 0);
-	change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP);
 }
 
 void user_init(void)

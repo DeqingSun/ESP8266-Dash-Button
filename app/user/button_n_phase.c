@@ -3,6 +3,8 @@
 #include "osapi.h"
 #include "gpio.h"
 
+uint8 current_state=BUTTONSTATE_BOOT;
+
 void ICACHE_FLASH_ATTR change_state(int8_t state){
 	switch (state){
 		case BUTTONSTATE_BOOT:
@@ -25,6 +27,7 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			os_printf("STATE:WIFI_FAILED\n");
 			break;
 	}
+	current_state=state;
 }
  
 void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
@@ -52,6 +55,14 @@ void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
 			if (duration>5000){
 				os_printf("Long Press!\n",duration);
 				//system_restart();	//change to Power down !!!!
+			}else{
+				switch (current_state){
+					case BUTTONSTATE_ESPTOUCH:
+						smartconfig_stop();
+						change_state(BUTTONSTATE_UDP_URL);
+						break;
+				
+				}
 			}
 		}
 	}else{	//pressed
