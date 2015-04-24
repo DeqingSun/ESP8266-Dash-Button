@@ -1,6 +1,7 @@
 #include "button_n_phase.h"
 #include "ets_sys.h"
 #include "osapi.h"
+#include "user_interface.h"
 #include "gpio.h"
 
 uint8 current_state=BUTTONSTATE_BOOT;
@@ -19,6 +20,55 @@ uint8 ICACHE_FLASH_ATTR get_state(void){
 uint32 last_edge_time=0;
 uint8 last_key_state=255;
 
+static volatile os_timer_t red_led_timer,green_led_timer;
+uint16 red_on,red_off,green_on,green_off;
+bool red_state=false,green_state=false;
+
+void ICACHE_FLASH_ATTR redLEDhandler(void *arg){
+	if (red_on==0){
+		red_state=true;
+	}else if (red_off==0){
+		red_state=false;
+	}else{
+		red_state=!red_state;
+	}
+	if (red_state){
+		GPIO_OUTPUT_SET(2, 0);
+		if (red_on>0) os_timer_arm(&red_led_timer, red_on, 0);
+	}else{
+		GPIO_DIS_OUTPUT(2);
+		if (red_off>0) os_timer_arm(&red_led_timer, red_off, 0);
+	}
+}
+
+void ICACHE_FLASH_ATTR greenLEDhandler(void *arg){
+	if (green_on==0){
+		green_state=true;
+	}else if (green_off==0){
+		green_state=false;
+	}else{
+		green_state=!green_state;
+	}
+	if (green_state){
+		GPIO_OUTPUT_SET(0, 0);
+		if (green_on>0) os_timer_arm(&green_led_timer, green_on, 0);
+	}else{
+		GPIO_DIS_OUTPUT(0);
+		if (green_off>0) os_timer_arm(&green_led_timer, green_off, 0);
+	}
+}
+
+void ICACHE_FLASH_ATTR updateLED(uint16 _red_on,uint16 _red_off,uint16 _green_on,uint16 _green_off){
+	red_on=_red_on;
+	red_off=_red_off;
+	green_on=_green_on;
+	green_off=_green_off;
+	os_timer_disarm(&red_led_timer);
+	os_timer_disarm(&green_led_timer);
+	os_timer_arm(&red_led_timer, 0, 0);
+	os_timer_arm(&green_led_timer, 0, 0);
+}
+
 void ICACHE_FLASH_ATTR change_state(int8_t state){
 	switch (state){
 		case BUTTONSTATE_BOOT:
@@ -29,6 +79,14 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			}else{
 				last_key_state=1;
 			}
+			
+			os_timer_disarm(&red_led_timer);
+			os_timer_setfn(&red_led_timer, (os_timer_func_t *)redLEDhandler, NULL);
+			os_timer_disarm(&green_led_timer);
+			os_timer_setfn(&green_led_timer, (os_timer_func_t *)greenLEDhandler, NULL);
+			
+			updateLED(1,0,0,1);
+			
 			break;
 		case BUTTONSTATE_ERR_SPIDATA_INVALID:
 			os_printf("STATE:DATA INVALID\n");
@@ -45,6 +103,7 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			break;	
 		case BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL:
 			os_printf("STATE:BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL\n");
+			updateLED(1,0,250,250);
 			break;
 		case BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER:
 			os_printf("STATE:BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER\n");
@@ -52,6 +111,14 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 		case BUTTONSTATE_ERR_WIFI_FAILED:
 			os_printf("STATE:WIFI_FAILED\n");
 			break;
+		case BUTTONSTATE_WIFI_RESP_200:
+			os_printf("STATE:RESP_200\n");
+			updateLED(1,0,480,20);
+			break;			
+		case BUTTONSTATE_WIFI_RESP_NOT_200:
+			os_printf("STATE:RESP_NOT_200\n");
+			updateLED(20,480,480,20);
+			break;				
 	}
 	current_state=state;
 }

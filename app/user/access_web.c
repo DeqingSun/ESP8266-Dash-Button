@@ -1,5 +1,6 @@
 #include "access_web.h"
 #include "url_parser.h"
+#include "button_n_phase.h"
 
 #include "osapi.h"
 
@@ -15,6 +16,8 @@ extern char url_abs_path[];
 extern uint16 url_port;
 extern bool host_is_IP;
 extern ip_addr_t host_ip;
+
+uint16 package_count=0;
 
 
 static void ICACHE_FLASH_ATTR networkSentCb(void *arg) {
@@ -43,6 +46,24 @@ static void ICACHE_FLASH_ATTR networkRecvCb(void *arg, char *data, unsigned shor
 	os_printf("\n");
   }
   
+  if (package_count==0){
+	bool valid_200=false;
+	if ((os_memcmp(data,"HTTP",4)==0)){
+	  char *space_ptr=memchr(data,' ',10);
+	  if (space_ptr!=NULL){
+		if ((os_memcmp(space_ptr+1,"200",3)==0)){
+		  valid_200=true;
+		}
+	  }
+	}
+	if (valid_200){
+	  change_state(BUTTONSTATE_WIFI_RESP_200);
+	}else{
+	  change_state(BUTTONSTATE_WIFI_RESP_NOT_200);
+	}
+  }
+  
+  package_count++;
   
   //uart0_tx_buffer(data,len);
   //for (x=0; x<len; x++) networkParseChar(conn, data[x]);
@@ -98,6 +119,7 @@ static void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip,
     espconn_regist_reconcb(conn, networkReconCb);
     espconn_regist_recvcb(conn, networkRecvCb);
     espconn_regist_sentcb(conn, networkSentCb);
+	package_count=0;
     if (espconn_connect(conn)!=0){
 	  os_printf("espconn_connect ERR\n");
 	}
