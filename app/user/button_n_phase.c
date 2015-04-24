@@ -94,12 +94,15 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			break;	
 		case BUTTONSTATE_ESPTOUCH:
 			os_printf("STATE:ESPTOUCH\n");
+			updateLED(1,0,50,50);
 			break;
 		case BUTTONSTATE_UDP_URL:
 			os_printf("STATE:UDP_URL\n");
+			updateLED(1,0,100,50);
 			break;
 		case BUTTONSTATE_SETTING_FINISHED:
 			os_printf("STATE:SETTING_FINISHED\n");
+			updateLED(1,0,480,20);
 			break;	
 		case BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL:
 			os_printf("STATE:BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL\n");
@@ -107,6 +110,7 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			break;
 		case BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER:
 			os_printf("STATE:BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER\n");
+			updateLED(1,0,250,250);
 			break;
 		case BUTTONSTATE_ERR_WIFI_FAILED:
 			os_printf("STATE:WIFI_FAILED\n");
@@ -154,6 +158,9 @@ void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
 							change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER);
 							startUDPServer_CB();
 						}
+						break;
+					case BUTTONSTATE_UDP_URL:
+						os_printf("oFF\n");	//todo Shutdown
 						break;
 				
 				}

@@ -91,7 +91,8 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 					}
 					break;
 				case BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER:{
-					init_udp_server();
+						change_state(BUTTONSTATE_UDP_URL);
+						init_udp_server();
 					}
 					break;
 			}
