@@ -40,6 +40,9 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 		case BUTTONSTATE_UDP_URL:
 			os_printf("STATE:UDP_URL\n");
 			break;
+		case BUTTONSTATE_SETTING_FINISHED:
+			os_printf("STATE:SETTING_FINISHED\n");
+			break;	
 		case BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL:
 			os_printf("STATE:BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL\n");
 			break;

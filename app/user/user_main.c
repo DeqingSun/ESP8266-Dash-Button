@@ -80,8 +80,8 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 							///connect_URL("blank.org");
 							//connect_URL("173.192.121.250");
 							//connect_URL("4.35.21.158/intl/en/about/");
-							connect_URL("retro.hackaday.com/retro.html");
-							
+							//connect_URL("retro.hackaday.com/retro.html");
+							connect_URL(spi_config_buffer.target_url);
 							
 						}else{
 							os_printf("IP IS ZERO!\n");
@@ -91,7 +91,7 @@ void ICACHE_FLASH_ATTR check_wifi_timerfunc(void *arg)
 					}
 					break;
 				case BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER:{
-					os_printf("UDP!\n");
+					init_udp_server();
 					}
 					break;
 			}
