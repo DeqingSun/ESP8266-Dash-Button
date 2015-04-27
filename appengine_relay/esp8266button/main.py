@@ -19,6 +19,7 @@ import webapp2
 from datetime import datetime
 
 from google.appengine.api import memcache
+from google.appengine.api import mail
 
 class ButtonHandler(webapp2.RequestHandler):
     def get(self):
@@ -37,6 +38,11 @@ class ButtonHandler(webapp2.RequestHandler):
             memcache.set("recent2_time", last_time2);
             memcache.set("recent1_time", last_time);
             memcache.set("recent0_time", current_time_str);
+            mail.send_mail(sender="button@esp8266button.appspotmail.com",
+              to="trigger@recipe.ifttt.com",
+              subject="trigger email",
+              body="Whatever")
+            
             
         
 class MainHandler(webapp2.RequestHandler):
@@ -50,7 +56,7 @@ class MainHandler(webapp2.RequestHandler):
         if (last_time1 == None):
                 last_time1 = "Unknown"
         if (last_time2 == None):
-                last_time3 = "Unknown"
+                last_time2 = "Unknown"
         self.response.write('recent button request<br>\n\r')
         self.response.write(last_time0+'<br>\n\r')
         self.response.write(last_time1+'<br>\n\r')
