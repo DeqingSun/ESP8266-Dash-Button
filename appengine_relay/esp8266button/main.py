@@ -16,10 +16,48 @@
 #
 import webapp2
 
+from datetime import datetime
+
+from google.appengine.api import memcache
+
+class ButtonHandler(webapp2.RequestHandler):
+    def get(self):
+        error_var = self.request.get("err","NO")
+        if (error_var == "YES"):
+            self.error(500)
+        else:    
+            self.response.write('OK')
+            current_time_str = datetime.now().strftime("%H:%M:%S on %B %d, %Y")
+            last_time = memcache.get("recent0_time");
+            last_time2 = memcache.get("recent1_time");
+            if (last_time == None):
+                last_time = "Unknown"
+            if (last_time2 == None):
+                last_time2 = "Unknown"            
+            memcache.set("recent2_time", last_time2);
+            memcache.set("recent1_time", last_time);
+            memcache.set("recent0_time", current_time_str);
+            
+        
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.write('Hello world!<br>\n\r')
+        last_time0=memcache.get("recent0_time");
+        last_time1=memcache.get("recent1_time");
+        last_time2=memcache.get("recent2_time");
+        if (last_time0 == None):
+                last_time0 = "Unknown"
+        if (last_time1 == None):
+                last_time1 = "Unknown"
+        if (last_time2 == None):
+                last_time3 = "Unknown"
+        self.response.write('recent button request<br>\n\r')
+        self.response.write(last_time0+'<br>\n\r')
+        self.response.write(last_time1+'<br>\n\r')
+        self.response.write(last_time2+'<br>\n\r')
+        
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler),
+    ('/button', ButtonHandler),
 ], debug=True)
