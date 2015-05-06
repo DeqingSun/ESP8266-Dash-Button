@@ -134,13 +134,15 @@ startUDPserver(void){
 
 void user_init(void)
 {
+	GPIO_OUTPUT_SET(12, 1);
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);
+	
 	system_timer_reinit();
     os_printf("SDK version:%s\n", system_get_sdk_version());
 	change_state(BUTTONSTATE_BOOT);
 	register_button_Callback(startUDPserver);
 	
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
-	
 	GPIO_DIS_OUTPUT(14);	//Set GPIO14 to Input
 	
 	//PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);	//functional on P14

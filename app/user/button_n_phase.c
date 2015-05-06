@@ -20,9 +20,13 @@ uint8 ICACHE_FLASH_ATTR get_state(void){
 uint32 last_edge_time=0;
 uint8 last_key_state=255;
 
-static volatile os_timer_t red_led_timer,green_led_timer;
+static volatile os_timer_t red_led_timer,green_led_timer,turn_off_timer;
 uint16 red_on,red_off,green_on,green_off;
 bool red_state=false,green_state=false;
+
+void ICACHE_FLASH_ATTR turnOffhandler(void *arg){
+	GPIO_OUTPUT_SET(12, 0);	//release mosfet
+}
 
 void ICACHE_FLASH_ATTR redLEDhandler(void *arg){
 	if (red_on==0){
@@ -84,6 +88,8 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			os_timer_setfn(&red_led_timer, (os_timer_func_t *)redLEDhandler, NULL);
 			os_timer_disarm(&green_led_timer);
 			os_timer_setfn(&green_led_timer, (os_timer_func_t *)greenLEDhandler, NULL);
+			os_timer_disarm(&turn_off_timer);
+			os_timer_setfn(&turn_off_timer, (os_timer_func_t *)turnOffhandler, NULL);
 			
 			updateLED(1,0,0,1);
 			
@@ -92,6 +98,7 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			os_printf("STATE:DATA INVALID\n");
 			//SHOW LED and turn off
 			updateLED(100,100,100,100);
+			os_timer_arm(&turn_off_timer, 200*5, 0);
 			break;	
 		case BUTTONSTATE_ESPTOUCH:
 			os_printf("STATE:ESPTOUCH\n");
