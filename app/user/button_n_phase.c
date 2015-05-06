@@ -91,6 +91,7 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 		case BUTTONSTATE_ERR_SPIDATA_INVALID:
 			os_printf("STATE:DATA INVALID\n");
 			//SHOW LED and turn off
+			updateLED(100,100,100,100);
 			break;	
 		case BUTTONSTATE_ESPTOUCH:
 			os_printf("STATE:ESPTOUCH\n");

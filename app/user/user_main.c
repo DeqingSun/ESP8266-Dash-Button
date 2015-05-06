@@ -183,6 +183,8 @@ void user_init(void)
 		
 	}else{
 		change_state(BUTTONSTATE_ERR_SPIDATA_INVALID);
+		wifi_set_opmode(STATION_MODE);
+		wifi_station_set_auto_connect(0);
 	}
 	
 /*	os_timer_disarm(&some_timer);
