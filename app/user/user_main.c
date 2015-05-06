@@ -24,9 +24,10 @@ extern struct spi_config spi_config_buffer;
 
 #define user_procTaskPrio        0
 #define user_procTaskQueueLen    1
-static volatile os_timer_t some_timer,check_wifi_timer;
+static volatile os_timer_t some_timer,check_wifi_timer,start_btn_timer;
 os_event_t    user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
+bool flash_data_valid;
 
 void ICACHE_FLASH_ATTR some_timerfunc(void *arg)
 {
@@ -132,10 +133,44 @@ startUDPserver(void){
 	os_timer_arm(&check_wifi_timer, 100, 0);
 }
 
-void user_init(void)
-{
+void ICACHE_FLASH_ATTR start_btn_timerfunc(void *arg){
+    static button_hold_counter=0;
+	if (GPIO_INPUT_GET(14)){
+		os_printf("HOLD BTN: %d\n",button_hold_counter*50);
+		if (button_hold_counter*50<2000){
+			if (flash_data_valid){
+				os_printf("Ready to rock\n");
+				os_printf("SSID: %s\n",spi_config_buffer.config.ssid);
+				os_printf("PASSWORD: %s\n",spi_config_buffer.config.password);
+				os_printf("BSSID_set: %d\n",spi_config_buffer.config.bssid_set);
+				wifi_set_opmode(STATION_MODE);
+				if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");	//this shouldn't happen
+				if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");	//this shouldn't happen
+				os_timer_arm(&check_wifi_timer, 100, 0);
+				os_printf("TRY to connect to WIFI\n");
+				change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL);
+			}else{
+				change_state(BUTTONSTATE_ERR_SPIDATA_INVALID);
+				wifi_set_opmode(STATION_MODE);
+				wifi_station_set_auto_connect(0);	
+			}
+		}else{
+			wifi_set_opmode(STATION_MODE);
+			smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
+			change_state(BUTTONSTATE_ESPTOUCH);
+		}
+	}else{
+		button_hold_counter++;
+		os_timer_arm(&start_btn_timer, 50, 0);
+	}
+
+}
+
+void user_init(void){
+	bool result;
+
 	GPIO_OUTPUT_SET(12, 1);
-	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);
+	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTDI_U, FUNC_GPIO12);	//hold power on
 	
 	system_timer_reinit();
     os_printf("SDK version:%s\n", system_get_sdk_version());
@@ -144,9 +179,8 @@ void user_init(void)
 	
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
 	GPIO_DIS_OUTPUT(14);	//Set GPIO14 to Input
-	
-	//PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);	//functional on P14
-	//PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
+	PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);	//internal pull up will affec circuit
+	PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
 	//PIN_PULLDWN_EN(PERIPHS_IO_MUX_MTMS_U);
 	
 	ETS_GPIO_INTR_DISABLE(); // Disable gpio interrupts
@@ -155,39 +189,17 @@ void user_init(void)
 	gpio_pin_intr_state_set(GPIO_ID_PIN(14), GPIO_PIN_INTR_ANYEDGE); // Interrupt on any GPIO14 edge
 	ETS_GPIO_INTR_ENABLE(); // Enable gpio interrupts
 	
-	
-	
 	os_timer_disarm(&some_timer);
     os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);
 	os_timer_disarm(&check_wifi_timer);
     os_timer_setfn(&check_wifi_timer, (os_timer_func_t *)check_wifi_timerfunc, NULL);
+	os_timer_disarm(&start_btn_timer);
+    os_timer_setfn(&start_btn_timer, (os_timer_func_t *)start_btn_timerfunc, NULL);
 	
-	if (readAndCheckSpiSetting()){
-		os_printf("Ready to rock\n");
-		os_printf("SSID: %s\n",spi_config_buffer.config.ssid);
-		os_printf("PASSWORD: %s\n",spi_config_buffer.config.password);
-		os_printf("BSSID_set: %d\n",spi_config_buffer.config.bssid_set);
-		if (GPIO_INPUT_GET(14)){
-			os_printf("14 HIGH\n");
-			wifi_set_opmode(STATION_MODE);
-			if (! wifi_station_set_config_current(&spi_config_buffer.config)) os_printf("ERR in config\n");	//this shouldn't happen
-			if (! wifi_station_set_auto_connect(1)) os_printf("ERR in auto connect\n");	//this shouldn't happen
-			os_timer_arm(&check_wifi_timer, 100, 0);
-			os_printf("TRY to connect to WIFI\n");
-			change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL);
-		}else{
-			os_printf("14 LOW\n");
-			wifi_set_opmode(STATION_MODE);
-			smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
-			change_state(BUTTONSTATE_ESPTOUCH);
-		}
-		
-		
-	}else{
-		change_state(BUTTONSTATE_ERR_SPIDATA_INVALID);
-		wifi_set_opmode(STATION_MODE);
-		wifi_station_set_auto_connect(0);
-	}
+	flash_data_valid=readAndCheckSpiSetting();
+	//check button;
+	os_timer_arm(&start_btn_timer, 1, 0);
+
 	
 /*	os_timer_disarm(&some_timer);
     os_timer_setfn(&some_timer, (os_timer_func_t *)some_timerfunc, NULL);

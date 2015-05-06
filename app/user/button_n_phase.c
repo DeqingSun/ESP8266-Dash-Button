@@ -74,6 +74,7 @@ void ICACHE_FLASH_ATTR updateLED(uint16 _red_on,uint16 _red_off,uint16 _green_on
 }
 
 void ICACHE_FLASH_ATTR change_state(int8_t state){
+	os_timer_disarm(&turn_off_timer);
 	switch (state){
 		case BUTTONSTATE_BOOT:
 			os_printf("STATE:BOOT\n");
@@ -103,14 +104,17 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 		case BUTTONSTATE_ESPTOUCH:
 			os_printf("STATE:ESPTOUCH\n");
 			updateLED(1,0,50,50);
+			os_timer_arm(&turn_off_timer, 5*60*1000UL, 0);
 			break;
 		case BUTTONSTATE_UDP_URL:
 			os_printf("STATE:UDP_URL\n");
 			updateLED(1,0,100,50);
+			os_timer_arm(&turn_off_timer, 30*1000, 0);
 			break;
 		case BUTTONSTATE_SETTING_FINISHED:
 			os_printf("STATE:SETTING_FINISHED\n");
 			updateLED(1,0,480,20);
+			os_timer_arm(&turn_off_timer, 2000, 0);
 			break;	
 		case BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL:
 			os_printf("STATE:BUTTONSTATE_WIFI_LOOK_FOR_AP_NORMAL\n");
@@ -122,14 +126,18 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			break;
 		case BUTTONSTATE_ERR_WIFI_FAILED:
 			os_printf("STATE:WIFI_FAILED\n");
+			updateLED(0,1,10,190);
+			os_timer_arm(&turn_off_timer, 200*5, 0);
 			break;
 		case BUTTONSTATE_WIFI_RESP_200:
 			os_printf("STATE:RESP_200\n");
 			updateLED(1,0,480,20);
+			os_timer_arm(&turn_off_timer, 200*5, 0);
 			break;			
 		case BUTTONSTATE_WIFI_RESP_NOT_200:
 			os_printf("STATE:RESP_NOT_200\n");
 			updateLED(20,480,480,20);
+			os_timer_arm(&turn_off_timer, 200*5, 0);
 			break;				
 	}
 	current_state=state;
@@ -159,6 +167,7 @@ void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
 			if (duration>5000 && last_edge_time>0){
 				os_printf("Long Press!\n",duration);
 				//system_restart();	//change to Power down !!!!
+				os_timer_arm(&turn_off_timer, 1, 0);
 			}else{
 				switch (current_state){
 					case BUTTONSTATE_ESPTOUCH:
@@ -169,6 +178,7 @@ void ICACHE_FLASH_ATTR button_intr_handler(int8_t key)
 						break;
 					case BUTTONSTATE_UDP_URL:
 						os_printf("oFF\n");	//todo Shutdown
+						os_timer_arm(&turn_off_timer, 1, 0);
 						break;
 				
 				}
