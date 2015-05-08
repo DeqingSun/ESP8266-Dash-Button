@@ -1,0 +1,2 @@
+eagle.flash.bin-------->0x00000
+eagle.irom0text.bin---->0x40000
