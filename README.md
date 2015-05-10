@@ -1,6 +1,6 @@
 # ESP8266 Dash Button
 
-![full](https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/img_assembled_crop.jpg)
+![full](https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/push_opti.gif)
 
 This is a small box with only one button. Every time you push the button. It will connect to WiFi and access an URL.
 
