@@ -9,16 +9,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button mButtonESPTouch,mButtonSETUrl;
+    private TextView mTextView;
     private EditText mEditSSID,mEditPassword,mEditURL;
     private static final String TAG = "ESP8266_Button";
     private ESP_Touch_AsyncTask activeESP_Touch_AsyncTask = null;
     private Set_URL_AsyncTask activeSet_URL_AsyncTask = null;
+    private Wifi_SSID_access mWifiSSIDAccess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +37,32 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mEditPassword=(EditText)findViewById(R.id.editText_Password);
         mEditURL=(EditText)findViewById(R.id.editText_URL);
 
-        mEditSSID.setText(getResources().getString(R.string.default_SSID));
-        mEditPassword.setText(getResources().getString(R.string.default_password));
+        mTextView = (TextView) findViewById(R.id.textView1);
+
+        mWifiSSIDAccess = new Wifi_SSID_access(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
         mEditURL.setText(getResources().getString(R.string.default_URL));
+
+        // display the connected ap's ssid
+        String apSsid = mWifiSSIDAccess.getWifiConnectedSsid();
+        if (apSsid != null) {
+            mEditSSID.setText(apSsid);
+            if (getResources().getString(R.string.default_SSID).equals(apSsid)){
+                mEditPassword.setText(getResources().getString(R.string.default_password));
+            }else{
+                mEditPassword.setText("");
+            }
+        } else {
+            mTextView.setText("WiFi not connected");
+            mEditSSID.setText(getResources().getString(R.string.default_SSID));
+            mEditPassword.setText(getResources().getString(R.string.default_password));
+        }
     }
 
 
