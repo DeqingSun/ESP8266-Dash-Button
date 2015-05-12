@@ -8,39 +8,45 @@ import java.util.zip.Checksum;
 public class rev_Class_m    //OK
         implements Checksum
 {
-    private static final short[] b = new short[256];
-    private final short a = 0;
-    private short c = 0;
+    private static final short[] crcTable = new short[256];
+    private final short init;
+    private short value;
+    private static final short CRC_POLYNOM = 0x8c;
+    private static final short CRC_INITIAL = 0x00;
 
     static
     {
         //fixed generate LUT
-        for (int i=0;i<256;i++){    //smali: i:v3 256:v5
-            int j=i;    //j:v0
+        for (int dividend=0;dividend<256;dividend++){    //smali: i:v3 256:v5
+            int remainder=dividend;    //j:v0
             for (int k=0;k<8;k++) {
-                if ((j & 0x1) != 0) {
-                    j = (j >> 1) ^ 0x8C;
+                if ((remainder & 0x1) != 0) {
+                    remainder = (remainder >> 1) ^ CRC_POLYNOM;
                 }else{
-                    j = j>>1;
+                    remainder = remainder>>1;
                 }
             }
-            b[i] = ((short)j);
+            crcTable[dividend] = ((short)remainder);
         }
     }
 
-    public void a(byte[] paramArrayOfByte)
+    public rev_Class_m() {
+        this.value = this.init = CRC_INITIAL;
+    }
+
+    public void update(byte[] buffer)
     {
-        update(paramArrayOfByte, 0, paramArrayOfByte.length);
+        update(buffer, 0, buffer.length);
     }
 
     public long getValue()
     {
-        return this.c & 0xFF;
+        return this.value & 0xFF;
     }
 
     public void reset()
     {
-        this.c = this.a;
+        this.value = this.init;
     }
 
     public void update(int paramInt)
@@ -48,14 +54,14 @@ public class rev_Class_m    //OK
         update(new byte[] { (byte)paramInt }, 0, 1);
     }
 
-    public void update(byte[] paramArrayOfByte, int paramInt1, int paramInt2)
+    public void update(byte[] buffer, int offset, int len)
     {
 
-        for (int i = 0;i<paramInt2;i++)
+        for (int i = 0;i<len;i++)
         {
-            int j = paramArrayOfByte[(paramInt1 + i)];
-            int k = this.c;
-            this.c = ((short)(b[((j ^ k) & 0xFF)] ^ this.c << 8));
+            int j = buffer[(offset + i)];
+            int k = this.value;
+            this.value = ((short)(crcTable[((j ^ k) & 0xFF)] ^ this.value << 8));
         }
     }
 }

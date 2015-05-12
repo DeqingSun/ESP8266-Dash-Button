@@ -43,7 +43,7 @@ public class rev_Class_b
 
         for (int i = 0;i<j;i++)
         {
-            arrayOfChar[i] = rev_Class_l_maybe_util.b(arrayOfByte[(i * 2)], arrayOfByte[(i * 2 + 1)]);
+            arrayOfChar[i] = rev_Class_l_maybe_util.combine2bytesToU8(arrayOfByte[(i * 2)], arrayOfByte[(i * 2 + 1)]);
         }
         return arrayOfChar;
     }
@@ -54,7 +54,7 @@ public class rev_Class_b
         byte[] arrayOfByte = a();
         for (int i = 0;i < arrayOfByte.length;i++)
         {
-            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);
+            String str = rev_Class_l_maybe_util.convertByte2HexString(arrayOfByte[i]);
             localStringBuilder.append("0x");
             if (str.length() == 1) {
                 localStringBuilder.append("0");

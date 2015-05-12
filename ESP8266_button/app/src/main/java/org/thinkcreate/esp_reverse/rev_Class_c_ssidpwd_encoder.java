@@ -20,25 +20,25 @@ public class rev_Class_c_ssidpwd_encoder
         this.a = new byte[localObject.length][];
 
         for (int i=0;i<this.a.length;i++){  //i:v0
-            this.a[i] = rev_Class_l_maybe_util.c(localObject[i]);//v5=this.a
+            this.a[i] = rev_Class_l_maybe_util.randomBytes(localObject[i]);//v5=this.a
         }
         char[] arrayOfChar = new rev_Class_e(c1, ssid).b(); //v2
         this.b = new byte[arrayOfChar.length][];
 
         for (int i=0;i<this.b.length;i++){
-            this.b[i] = rev_Class_l_maybe_util.c(arrayOfChar[i]);//v4=this.b
+            this.b[i] = rev_Class_l_maybe_util.randomBytes(arrayOfChar[i]);//v4=this.b
         }
         char[] arrayOfChar3=new rev_Class_f(c2).b();//v2
         this.c = new byte[arrayOfChar3.length][];
 
         for (int i=0;i<this.c.length;i++){
-            this.c[i] = rev_Class_l_maybe_util.c(arrayOfChar3[i]);//v3=this.c
+            this.c[i] = rev_Class_l_maybe_util.randomBytes(arrayOfChar3[i]);//v3=this.c
         }
         char[] arrayOfChar4 = new rev_Class_b(ssid, password).b();//v0
         this.d = new byte[arrayOfChar4.length][];
 
         for (int i=0;i<this.d.length;i++){  //i:v1
-            this.d[i] = rev_Class_l_maybe_util.c(arrayOfChar4[i]);//v2=this.d
+            this.d[i] = rev_Class_l_maybe_util.randomBytes(arrayOfChar4[i]);//v2=this.d
         }
 
         //identical to origin, format are same, content should be random

@@ -15,7 +15,7 @@ public class rev_Class_d {
         byte[] arrayOfByte = a();   //v2
         for (int i = 0;i<4;i++)    //v0
         {
-            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);  //v3
+            String str = rev_Class_l_maybe_util.convertByte2HexString(arrayOfByte[i]);  //v3
             localStringBuilder.append("0x");
             if (str.length() == 1) {
                 localStringBuilder.append("0");

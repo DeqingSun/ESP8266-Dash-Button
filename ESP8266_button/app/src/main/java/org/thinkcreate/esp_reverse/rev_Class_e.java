@@ -20,19 +20,19 @@ public class rev_Class_e {
         if (paramChar < 16) {
             c1 = (char)(paramChar + 128);
         }
-        byte[] localByteArray = rev_Class_l_maybe_util.b(c1);
+        byte[] localByteArray = rev_Class_l_maybe_util.splitUint8To2bytes(c1);
         this.a = localByteArray[0];
         this.b = localByteArray[1];
         rev_Class_m localObject = new rev_Class_m();
-        localObject.a(paramString.getBytes());
-        byte[] localByteArray2 = rev_Class_l_maybe_util.b((char)((int)localObject.getValue()));
+        localObject.update(paramString.getBytes());
+        byte[] localByteArray2 = rev_Class_l_maybe_util.splitUint8To2bytes((char) ((int) localObject.getValue()));
         this.c = localByteArray2[0];
         this.d = localByteArray2[1];
     }
 
     public byte[] a()
     {
-        return new byte[] { 0, rev_Class_l_maybe_util.a((byte)0, this.a), 0, rev_Class_l_maybe_util.a((byte)1, this.b), 0, rev_Class_l_maybe_util.a((byte)2, this.c), 0, rev_Class_l_maybe_util.a((byte)3, this.d) };
+        return new byte[] { 0, rev_Class_l_maybe_util.combine2bytesToOne((byte) 0, this.a), 0, rev_Class_l_maybe_util.combine2bytesToOne((byte) 1, this.b), 0, rev_Class_l_maybe_util.combine2bytesToOne((byte) 2, this.c), 0, rev_Class_l_maybe_util.combine2bytesToOne((byte) 3, this.d) };
     }
 
     public char[] b()
@@ -42,7 +42,7 @@ public class rev_Class_e {
         char[] arrayOfChar = new char[halfArrayLen];    //v3
         for (int i=0;i < halfArrayLen;i += 1)   //i:v0
         {
-            arrayOfChar[i] = rev_Class_l_maybe_util.b(arrayOfByte[(i * 2)], arrayOfByte[(i * 2 + 1)]);
+            arrayOfChar[i] = rev_Class_l_maybe_util.combine2bytesToU8(arrayOfByte[(i * 2)], arrayOfByte[(i * 2 + 1)]);
         }
         return arrayOfChar;
     }
@@ -54,7 +54,7 @@ public class rev_Class_e {
 
         for (int i = 0;i<8;i++)//v0
         {
-            String str = rev_Class_l_maybe_util.b(arrayOfByte[i]);  //v3
+            String str = rev_Class_l_maybe_util.convertByte2HexString(arrayOfByte[i]);  //v3
             localStringBuilder.append("0x");
             if (str.length() == 1) {
                 localStringBuilder.append("0");
