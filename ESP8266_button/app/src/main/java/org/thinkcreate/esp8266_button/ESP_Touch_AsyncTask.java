@@ -2,6 +2,7 @@ package org.thinkcreate.esp8266_button;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
@@ -14,7 +15,7 @@ import org.thinkcreate.esp_reverse.rev_Class_h_ESP_TOUCH_Main;
 public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
     {
         private Activity parentActivity;
-        private ProgressDialog c;
+        private ProgressDialog mProgressDialog;
         private final String ssidStr;
         private final String passwordStr;
         private boolean g;
@@ -91,6 +92,31 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
         this.c.setCanceledOnTouchOutside(false);
         this.c.setOnCancelListener(this);
         this.c.show();*/
+
+        mProgressDialog = new ProgressDialog(parentActivity);
+        mProgressDialog
+                .setMessage("Esptouch is configuring, please wait for a moment...");
+        mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Log.i(TAG, "progress dialog is canceled");
+                //if (mEsptouchTask != null) {
+                //    mEsptouchTask.interrupt();
+                //}
+            }
+        });
+        mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                "Waiting...", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        mProgressDialog.show();
+        mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                .setEnabled(false);
+
+
         Log.d(TAG, "PRE EXE");
         parentActivity.runOnUiThread(new Runnable() {
             @Override
@@ -102,6 +128,21 @@ public class ESP_Touch_AsyncTask extends AsyncTask<Void,Void,Boolean>
 
         @Override
         protected void onPostExecute(Boolean result) {
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setEnabled(true);
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(
+                    "Confirm");
+            // it is unnecessary at the moment, add here just to show how to use isCancelled()
+            /*if (!result.isCancelled()) {
+                if (result.isSuc()) {
+                    mProgressDialog.setMessage("Esptouch success, bssid = "
+                            + result.getBssid());
+                } else {
+                    mProgressDialog.setMessage("Esptouch fail");
+                }
+            }*/
+
+
             Log.d(TAG, "POST");
             Log.d(TAG, result?"SET OK":"SET Failed");
             final boolean result2=result;
