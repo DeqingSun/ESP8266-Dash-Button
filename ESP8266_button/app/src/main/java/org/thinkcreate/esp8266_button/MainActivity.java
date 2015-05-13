@@ -1,6 +1,8 @@
 package org.thinkcreate.esp8266_button;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.espressif.iot.esptouch.EsptouchTask;
+import com.espressif.iot.esptouch.IEsptouchResult;
+import com.espressif.iot.esptouch.IEsptouchTask;
+import com.espressif.iot.esptouch.task.__IEsptouchTask;
+
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
@@ -19,7 +26,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private TextView mTextView;
     private EditText mEditSSID,mEditPassword,mEditURL;
     private static final String TAG = "ESP8266_Button";
-    private ESP_Touch_AsyncTask activeESP_Touch_AsyncTask = null;
     private Set_URL_AsyncTask activeSet_URL_AsyncTask = null;
     private Wifi_SSID_access mWifiSSIDAccess;
 
@@ -93,21 +99,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if (mButtonESPTouch == v){
             Log.d(TAG, "START ESPTouch");
 
-            String ssid = mEditSSID.getText().toString();
-            String password = mEditPassword.getText().toString();
+            String apSsid = mEditSSID.getText().toString();
+            String apPassword = mEditPassword.getText().toString();
 
-            //new activity_B_class(this, this, ssid, password).execute(new String[0]);
-            //testClass test = new testClass();
-            if (activeESP_Touch_AsyncTask!=null){
-                activeESP_Touch_AsyncTask.cancel(true);
+            if (__IEsptouchTask.DEBUG) {
+                Log.d(TAG, "mBtnConfirm is clicked, mEdtApSsid = " + apSsid
+                        + ", " + " mEdtApPassword = " + apPassword);
             }
-            if (activeESP_Touch_AsyncTask!=null && activeESP_Touch_AsyncTask.getStatus() == AsyncTask.Status.RUNNING){
-                Log.d(TAG, "Not cancelled yet");
-                Toast.makeText(getApplicationContext(), "Still killing old task\nplease try again", Toast.LENGTH_SHORT).show();
-            }else {
-                activeESP_Touch_AsyncTask = new ESP_Touch_AsyncTask(this, this, ssid, password);
-                activeESP_Touch_AsyncTask.execute();
-            }
+            new EsptouchAsyncTask2().execute(apSsid, apPassword);
         }else if(mButtonSETUrl == v){
             Log.d(TAG, "START Setting URL");
 
@@ -129,6 +128,71 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
 
+    }
+
+    /**
+     * EsptouchAsyncTask2是主要的配置任务
+     * */
+    private class EsptouchAsyncTask2 extends AsyncTask<String, Void, IEsptouchResult> {
+
+        private ProgressDialog mProgressDialog;
+
+        private IEsptouchTask mEsptouchTask;
+
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = new ProgressDialog(MainActivity.this);
+            mProgressDialog
+                    .setMessage("Esptouch is configuring, please wait for a moment...");
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    if (__IEsptouchTask.DEBUG) {
+                        Log.i(TAG, "progress dialog is canceled");
+                    }
+                    if (mEsptouchTask != null) {
+                        mEsptouchTask.interrupt();
+                    }
+                }
+            });
+            mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE,
+                    "Waiting...", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            mProgressDialog.show();
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setEnabled(false);
+        }
+
+        @Override
+        protected IEsptouchResult doInBackground(String... params) {
+            String apSsid = params[0];
+            String apPassword = params[1];
+            mEsptouchTask = new EsptouchTask(apSsid, apPassword,
+                    MainActivity.this);
+            IEsptouchResult result = mEsptouchTask.executeForResult();
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(IEsptouchResult result) {
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+                    .setEnabled(true);
+            mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(
+                    "Confirm");
+            // it is unnecessary at the moment, add here just to show how to use isCancelled()
+            if (!result.isCancelled()) {
+                if (result.isSuc()) {
+                    mProgressDialog.setMessage("Esptouch success, bssid = "
+                            + result.getBssid());
+                } else {
+                    mProgressDialog.setMessage("Esptouch fail");
+                }
+            }
+        }
     }
 
 }
