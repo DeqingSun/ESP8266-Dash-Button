@@ -103,12 +103,16 @@ void ICACHE_FLASH_ATTR change_state(int8_t state){
 			break;	
 		case BUTTONSTATE_ESPTOUCH:
 			os_printf("STATE:ESPTOUCH\n");
-			updateLED(1,0,50,50);
+			updateLED(1,0,50,950);
 			os_timer_arm(&turn_off_timer, 5*60*1000UL, 0);
+			break;
+		case BUTTONSTATE_ESPTOUCH_SSID_GOT:
+			os_printf("STATE:ESPTOUCH\n");
+			updateLED(1,0,500,500);
 			break;
 		case BUTTONSTATE_UDP_URL:
 			os_printf("STATE:UDP_URL\n");
-			updateLED(1,0,100,50);
+			updateLED(1,0,150,50);
 			os_timer_arm(&turn_off_timer, 30*1000, 0);
 			break;
 		case BUTTONSTATE_SETTING_FINISHED:
