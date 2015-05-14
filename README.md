@@ -22,11 +22,11 @@ There is an minimal Android app in this repo that can do configuration wirelessl
 
 ![](https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/Screenshot_app.png)
 
-The app is a barely working one and it lacks advances fetures for now. However it do work. You can hold button on ESP8266 board for 5 seconds and it will enter ESP-TOUCH mode. The Android code is a bit messy because they are decompiled from a obfuscated APK file. 
+The app is a barely working one and it lacks advanced features for now. However it does work. You can hold button on ESP8266 board for 5 seconds and it will enter ESP-TOUCH mode. The Android code is a bit messy because they are decompiled from a obfuscated APK file. 
 
-You can connect your phone to target WiFi network, fill textbox with SSID and passwork and press "ESPTouch", then the app will encode SSID and passwork in length of UDP packets and broadcast packets to all devices. If ESP8266 decodes WiFi information successfully, it will broadcast a UDP packet back to your phone to end pairing process and listen UDP packets for URL. You can enter URL into third textbox and press "SET URL" to finish setting process.
+You can connect your phone to target WiFi network, fill textbox with SSID and password and press "ESPTouch", then the app will encode SSID and password in length of UDP packets and broadcast packets to all devices. If ESP8266 decodes WiFi information successfully, it will broadcast a UDP packet back to your phone to end pairing process and listen UDP packets for URL. You can enter URL into third textbox and press "SET URL" to finish setting process.
 
-If you want to change URL only, press button once when it is in ESP-Touch mode.
+If you want to change the URL only, press button once when it is in ESP-Touch mode.
 
 ## How to make one
 
