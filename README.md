@@ -32,6 +32,8 @@ If you want to change the URL only, press button once when it is in ESP-Touch mo
 
 You can use the gerber files in this repo or you can order PCB with [OSH Park](https://oshpark.com/shared_projects/X8mGIjUE) directly.
 
+![](https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/Assembly.jpg)
+
 After you solder all parts and ESP-12 module, you can either compile the source code on your own or use the pre-compiled bin files. 
 
 ## How to do more things with IFTTT
