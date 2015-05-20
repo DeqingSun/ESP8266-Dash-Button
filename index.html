@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Esp8266-dash-button : Open sourced WiFi Button">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Esp8266-dash-button</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/DeqingSun/ESP8266-Dash-Button">View on GitHub</a>
+
+          <h1 id="project_title">Esp8266-dash-button</h1>
+          <h2 id="project_tagline">Open sourced WiFi Button</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/DeqingSun/ESP8266-Dash-Button/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/DeqingSun/ESP8266-Dash-Button/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="esp8266-dash-button" class="anchor" href="#esp8266-dash-button" aria-hidden="true"><span class="octicon octicon-link"></span></a>ESP8266 Dash Button</h1>
+
+<p><img src="https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/push_opti.gif" alt="full"></p>
+
+<p>This is a small box with only one button. Every time you push the button. It will connect to WiFi and access an URL.</p>
+
+<p>WiFi SSID and Password can be configured through ESP-TOUCH protocol and the URL can be changed by UDP packet. Two LEDs on it's case shows status of module and circuit.</p>
+
+<h2>
+<a id="internal-structure" class="anchor" href="#internal-structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Internal Structure</h2>
+
+<p><img src="https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/render_clipped.jpg" alt=""></p>
+
+<p>This button consists of following parts: Two AA batteries and battery holder, ESP8266 module and circuit, a big button for better experience, case, button cover. </p>
+
+<h2>
+<a id="how-it-works" class="anchor" href="#how-it-works" aria-hidden="true"><span class="octicon octicon-link"></span></a>How it works</h2>
+
+<p>When button is pressed, the circuit powers ESP8266 module and the module will connect to WiFi with SSID and password in flash memory. Once Wifi connection is established, this button will request a certain URL in flash memory and turn itself off to save power.</p>
+
+<h2>
+<a id="how-to-config-wifi-network-and-url" class="anchor" href="#how-to-config-wifi-network-and-url" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to config WiFi network and URL</h2>
+
+<p>There is an minimal Android app in this repo that can do configuration wirelessly.</p>
+
+<p><img src="https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/Screenshot_app.png" alt=""></p>
+
+<p>The app is a barely working one and it lacks advanced features for now. However it does work. You can hold button on ESP8266 board for 5 seconds and it will enter ESP-TOUCH mode. The Android code is a bit messy because they are decompiled from a obfuscated APK file. </p>
+
+<p>You can connect your phone to target WiFi network, fill textbox with SSID and password and press "ESPTouch", then the app will encode SSID and password in length of UDP packets and broadcast packets to all devices. If ESP8266 decodes WiFi information successfully, it will broadcast a UDP packet back to your phone to end pairing process and listen UDP packets for URL. You can enter URL into third textbox and press "SET URL" to finish setting process.</p>
+
+<p>If you want to change the URL only, press button once when it is in ESP-Touch mode.</p>
+
+<h2>
+<a id="how-to-make-one" class="anchor" href="#how-to-make-one" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to make one</h2>
+
+<p>You can use the gerber files in this repo or you can order PCB with <a href="https://oshpark.com/shared_projects/X8mGIjUE">OSH Park</a> directly.</p>
+
+<p><img src="https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/Assembly.jpg" alt=""></p>
+
+<p>After you solder all parts and ESP-12 module, you can either compile the source code on your own or use the pre-compiled bin files. </p>
+
+<h2>
+<a id="how-to-do-more-things-with-ifttt" class="anchor" href="#how-to-do-more-things-with-ifttt" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to do more things with IFTTT</h2>
+
+<p>Currently IFTTT can not be triggered with a HTTP request. So I created a App Engine app to send a Email to IFTTT. The app can print all email it received in log file so you can create account with App Engine Email Address.</p>
+
+<p>Here is an example of add Google Calendar entry with button.</p>
+
+<p><img src="https://raw.githubusercontent.com/DeqingSun/ESP8266-Dash-Button/master/circuit/press_button.png" alt=""></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Esp8266-dash-button maintained by <a href="https://github.com/DeqingSun">DeqingSun</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
