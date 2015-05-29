@@ -104,6 +104,7 @@ static void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip,
   struct espconn *conn=(struct espconn *)arg;
   if (ip==NULL) {
     os_printf("Nslookup failed ERR\n");
+	change_state(BUTTONSTATE_ERR_WIFI_FAILED);
   }else{
 	os_printf("DST: %d.%d.%d.%d\n",
   *((uint8 *)&ip->addr), *((uint8 *)&ip->addr + 1),
@@ -122,6 +123,7 @@ static void ICACHE_FLASH_ATTR user_dns_found_CB(const char *name, ip_addr_t *ip,
 	package_count=0;
     if (espconn_connect(conn)!=0){
 	  os_printf("espconn_connect ERR\n");
+	  change_state(BUTTONSTATE_ERR_WIFI_FAILED);
 	}
   }
 
