@@ -24,7 +24,7 @@ extern struct spi_config spi_config_buffer;
 
 #define user_procTaskPrio        0
 #define user_procTaskQueueLen    1
-static volatile os_timer_t some_timer,check_wifi_timer,start_btn_timer,smartconfig_timer;
+static volatile os_timer_t some_timer,check_wifi_timer,start_btn_timer;
 os_event_t    user_procTaskQueue[user_procTaskQueueLen];
 static void user_procTask(os_event_t *events);
 bool flash_data_valid;
@@ -111,40 +111,47 @@ user_procTask(os_event_t *events)
     os_delay_us(10);
 }
 
-void ICACHE_FLASH_ATTR smartconfig_timerfunc(void *arg){
-	static uint8 last_status=0;
-	uint8 current_status = smartconfig_get_status();
-	if (current_status!=last_status){
-		os_printf("SMART %d\n",current_status);
-		last_status=current_status;
-		if (current_status==SC_STATUS_WAIT || current_status==SC_STATUS_FIND_CHANNEL){
-			change_state(BUTTONSTATE_ESPTOUCH);
-		}else{
-			change_state(BUTTONSTATE_ESPTOUCH_SSID_GOT);
-		}		
-	}
-	os_timer_arm(&smartconfig_timer, 2000, 0);
-}
-
 void ICACHE_FLASH_ATTR
-smartconfig_done(void *data)
+smartconfig_done(sc_status status, void *pdata)
 {
-	struct station_config *sta_conf = data;
-	change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER);
-	os_timer_disarm(&smartconfig_timer);	//stop checking smartconfig
-	os_memcpy(&spi_config_buffer.config, sta_conf, sizeof(struct station_config));
+    switch(status) {
+        case SC_STATUS_WAIT:
+            os_printf("SC_STATUS_WAIT\n");
+            break;
+        case SC_STATUS_FIND_CHANNEL:
+            os_printf("SC_STATUS_FIND_CHANNEL\n");
+            break;
+        case SC_STATUS_GETTING_SSID_PSWD:
+            os_printf("SC_STATUS_GETTING_SSID_PSWD\n");
+            break;
+        case SC_STATUS_LINK:
+            os_printf("SC_STATUS_LINK\n");
+            struct station_config *sta_conf = pdata;
+			
+			change_state(BUTTONSTATE_WIFI_LOOK_FOR_AP_UDP_SERVER);
+			os_memcpy(&spi_config_buffer.config, sta_conf, sizeof(struct station_config));
 	
-	if(!writeSpiSetting()) os_printf("SPI write ERR\n");
+			if(!writeSpiSetting()) os_printf("SPI write ERR\n");
 
-	wifi_station_set_config(sta_conf);
-	wifi_station_disconnect();
-	wifi_station_connect();
-	os_timer_arm(&check_wifi_timer, 100, 0);
+			wifi_station_set_config(sta_conf);
+			wifi_station_disconnect();
+			wifi_station_connect();
+			os_timer_arm(&check_wifi_timer, 100, 0);
+            break;
+        case SC_STATUS_LINK_OVER:
+            os_printf("SC_STATUS_LINK_OVER\n");
+            smartconfig_stop();
+            break;
+    }
+	if (status==SC_STATUS_WAIT || status==SC_STATUS_FIND_CHANNEL){
+		change_state(BUTTONSTATE_ESPTOUCH);
+	}else if (status==SC_STATUS_GETTING_SSID_PSWD){
+		change_state(BUTTONSTATE_ESPTOUCH_SSID_GOT);
+	}		
 }
 
 void ICACHE_FLASH_ATTR
 startUDPserver(void){
-	os_timer_disarm(&smartconfig_timer);	//stop checking smartconfig
 	smartconfig_stop();	
 	wifi_station_connect();
 	os_timer_arm(&check_wifi_timer, 100, 0);
@@ -173,15 +180,17 @@ void ICACHE_FLASH_ATTR start_btn_timerfunc(void *arg){
 			}
 		}else{
 			wifi_set_opmode(STATION_MODE);
-			smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 0);
+			smartconfig_start(SC_TYPE_ESPTOUCH, smartconfig_done, 1);
 			change_state(BUTTONSTATE_ESPTOUCH);
-			os_timer_arm(&smartconfig_timer, 2000, 0);
 		}
 	}else{
 		button_hold_counter++;
 		os_timer_arm(&start_btn_timer, 50, 0);
 	}
 
+}
+
+void user_rf_pre_init(void){
 }
 
 void user_init(void){
@@ -198,7 +207,7 @@ void user_init(void){
 	PIN_FUNC_SELECT(PERIPHS_IO_MUX_MTMS_U, FUNC_GPIO14);
 	GPIO_DIS_OUTPUT(14);	//Set GPIO14 to Input
 	PIN_PULLUP_DIS(PERIPHS_IO_MUX_MTMS_U);	//internal pull up will affec circuit
-	PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
+	//PIN_PULLDWN_DIS(PERIPHS_IO_MUX_MTMS_U);
 	//PIN_PULLDWN_EN(PERIPHS_IO_MUX_MTMS_U);
 	
 	ETS_GPIO_INTR_DISABLE(); // Disable gpio interrupts
@@ -213,8 +222,6 @@ void user_init(void){
     os_timer_setfn(&check_wifi_timer, (os_timer_func_t *)check_wifi_timerfunc, NULL);
 	os_timer_disarm(&start_btn_timer);
     os_timer_setfn(&start_btn_timer, (os_timer_func_t *)start_btn_timerfunc, NULL);
-	os_timer_disarm(&smartconfig_timer);
-    os_timer_setfn(&smartconfig_timer, (os_timer_func_t *)smartconfig_timerfunc, NULL);
 	
 	flash_data_valid=readAndCheckSpiSetting();
 	//check button;
