@@ -42,6 +42,15 @@ public class Wifi_SSID_access {
         }
     }
 
+    public String getWifiConnectedBssid() {
+        WifiInfo mWifiInfo = getConnectionInfo();
+        String bssid = null;
+        if (mWifiInfo != null && isWifiConnected()) {
+            bssid = mWifiInfo.getBSSID();
+        }
+        return bssid;
+    }
+
     // get the wifi info which is "connected" in wifi-setting
     private WifiInfo getConnectionInfo() {
         WifiManager mWifiManager = (WifiManager) mContext
